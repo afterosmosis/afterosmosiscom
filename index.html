@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>after osmosis</title>
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="stylesheet" href="theme.css">
+<script src="theme.js"></script>
+<style>
+  .home-main{
+    position:relative;z-index:5;min-height:100vh;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:84px 20px 28px;
+  }
+  .intro{text-align:center;margin-bottom:2px}
+  .intro .lead{font-size:12px;letter-spacing:.16em;color:var(--ink-dim);text-transform:uppercase}
+  .stage{width:min(620px,80vmin);margin:0 auto}
+  .tnum-short{display:none}
+  .sig-svg{display:block;width:100%;height:auto;overflow:visible}
+  .tagline{
+    text-align:center;margin-top:2px;font-size:13px;letter-spacing:.22em;color:var(--ink-dim);
+  }
+  .tagline b{color:var(--line);font-weight:400}
+  .hint{margin-top:14px;text-align:center;font-size:11px;letter-spacing:.16em;color:var(--ink-faint)}
+  .hint .k{color:var(--accent)}
+
+  /* sigil motion — the rings use SMIL animateTransform in markup (Firefox bug
+     1610093 makes `transform-box: fill-box` zero-size on fill="none" elements,
+     killing CSS rotations). These rules only handle the intro + hover dial swing. */
+  .par{transform-box:fill-box;transform-origin:center}
+  /* dial: the whole ring stack turns toward a hovered node, then eases back */
+  #dial{transform-box:fill-box;transform-origin:center;transition:transform 1.15s cubic-bezier(.16,1,.3,1)}
+  .sigil{transform-box:fill-box;transform-origin:center;animation:siglin 1.4s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes siglin{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+  /* sweep: passive spin + smooth aim-at-node are both driven from JS rAF,
+     so this rule only styles the static appearance. */
+  .sweep{opacity:.5}
+  .aiming .sweep{opacity:.95;stroke-width:2.6}
+  .aiming #dial{filter:drop-shadow(0 0 5px var(--accent-glow))}
+  /* music-terminal pulsing ring uses SMIL <animate> for the same reason as the dial rings. */
+  .mring{transform-box:fill-box;transform-origin:center}
+
+  /* terminals */
+  .term{cursor:pointer}
+  .term .hot{fill:transparent}
+  .term .tnode{fill:var(--line);transition:fill .2s}
+  .term .thole{fill:var(--bg)}
+  .term .tring{fill:none;stroke:var(--accent);stroke-width:1.5;opacity:0;transition:opacity .2s;stroke-dasharray:3 4}
+  .term .tstub{stroke:var(--line);stroke-width:3;transition:stroke .2s}
+  .term .tlabel{fill:var(--line);font-size:17px;font-weight:700;letter-spacing:.14em;transition:fill .2s}
+  .term .tnum{fill:var(--ink-faint);font-size:10px;letter-spacing:.1em}
+  .term .tdot{fill:var(--line);transition:fill .2s}
+  .term:hover .tnode,.term:focus-visible .tnode{fill:var(--accent)}
+  .term:hover .tlabel,.term:focus-visible .tlabel{fill:var(--accent)}
+  .term:hover .tstub,.term:focus-visible .tstub{stroke:var(--accent)}
+  .term:hover .tdot{fill:var(--accent)}
+  .term:hover .tring,.term:focus-visible .tring{opacity:1}
+  .term.lit .tnode{fill:var(--accent)}
+  .term.lit .tlabel{fill:var(--line)}
+  .term.lit .tstub{stroke:var(--accent)}
+  .term:focus{outline:none}
+
+  /* links overlay */
+  .linkmodal{display:none;position:fixed;inset:0;z-index:60;background:rgba(6,7,9,.86);
+    align-items:center;justify-content:center}
+  html[data-theme="light"] .linkmodal{background:rgba(231,226,212,.86)}
+  .linkmodal.on{display:flex}
+  .linkbox{width:90%;max-width:420px;background:var(--panel);box-shadow:0 24px 60px rgba(0,0,0,.4)}
+  html[data-theme="light"] .linkbox{box-shadow:0 24px 60px rgba(80,70,50,.22)}
+  .linkbox .panel-bd{display:flex;flex-direction:column;gap:0}
+  .linkrow{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:15px 6px;border-bottom:1px solid var(--line-dim);text-decoration:none;color:var(--line);
+    transition:color .18s,padding-left .18s}
+  .linkrow:last-child{border-bottom:none}
+  .linkrow:hover{color:var(--accent);padding-left:12px}
+  .linkrow .h{font-size:14px;letter-spacing:.06em}
+  .linkrow .a{font-size:11px;color:var(--ink-faint);letter-spacing:.04em}
+  .linkrow:hover .a{color:var(--accent-2)}
+
+  @media (max-width:640px){
+    .home-main{padding:58px 6px 18px;justify-content:flex-start;gap:6px}
+    .intro .lead{font-size:10px;letter-spacing:.12em}
+    .stage{width:min(620px,98vmin)}
+    .term .tlabel{font-size:24px;letter-spacing:.08em}
+    .term .tnum{font-size:12px;letter-spacing:.08em}
+    /* push sublabels clear of the bigger title text */
+    .tnum-top{transform:translateY(-10px);transform-box:fill-box;transform-origin:center}
+    .tnum-bot{transform:translateY(12px);transform-box:fill-box;transform-origin:center}
+    .tnum-full{display:none}
+    .tnum-short{display:inline}
+    .tagline{font-size:10px;letter-spacing:.1em;margin-top:4px;padding:0 12px}
+    .hint{font-size:10px;letter-spacing:.12em;margin-top:8px;padding:0 12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9" stroke-dasharray="22 7 12 5"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>
+      <img class="wordmark" src="brand-wordmark.png" alt="after osmosis">
+    </a>
+  </header>
+
+  <main class="home-main" data-screen-label="home">
+    <div class="intro"><div class="lead">noise from the desert</div></div>
+
+    <div class="stage">
+      <svg class="sig-svg" viewBox="0 0 800 800" role="img" aria-label="after osmosis — navigation sigil">
+        <g class="par" id="par">
+        <g class="sigil">
+          <!-- axes behind core -->
+          <g stroke="var(--line)" stroke-width="2" opacity=".55">
+            <line x1="393" y1="118" x2="393" y2="602"/>
+            <line x1="407" y1="118" x2="407" y2="602"/>
+            <line x1="160" y1="360" x2="640" y2="360"/>
+          </g>
+
+          <!-- diagonal spokes -->
+          <g stroke="var(--line)" stroke-width="3">
+            <line x1="461" y1="299" x2="612" y2="148"/>
+            <line x1="339" y1="299" x2="188" y2="148"/>
+            <line x1="461" y1="421" x2="612" y2="572"/>
+            <line x1="339" y1="421" x2="188" y2="572"/>
+          </g>
+
+          <!-- DIAL: rings + sweep + band dots, turns toward a hovered node -->
+          <g id="dial">
+          <!-- rings (irregular spacing / gaps / sizes · mixed direction + speed).
+               Animated with SMIL <animateTransform> rather than CSS keyframes because
+               Firefox bug 1610093 makes `transform-box: fill-box` return a zero-size
+               box for SVG elements with fill="none" (all our rings), which kills the
+               CSS rotation pivot. SMIL `rotate(angle cx cy)` carries its own pivot. -->
+          <circle cx="400" cy="360" r="300" fill="none" stroke="var(--line)" stroke-width="9" stroke-dasharray="184 26 58 46 112 28 74 20"><animateTransform attributeName="transform" type="rotate" from="0 400 360" to="360 400 360" dur="220s" repeatCount="indefinite"/></circle>
+          <circle cx="400" cy="360" r="270" fill="none" stroke="var(--line-2)" stroke-width="11" stroke-dasharray="2 19"><animateTransform attributeName="transform" type="rotate" from="360 400 360" to="0 400 360" dur="95s" repeatCount="indefinite"/></circle>
+          <circle cx="400" cy="360" r="236" fill="none" stroke="var(--line)" stroke-width="25" stroke-dasharray="124 82 36 58 96 30"><animateTransform attributeName="transform" type="rotate" from="0 400 360" to="360 400 360" dur="140s" repeatCount="indefinite"/></circle>
+          <circle cx="400" cy="360" r="210" fill="none" stroke="var(--line-dim)" stroke-width="2" stroke-dasharray="60 28 140 40"><animateTransform attributeName="transform" type="rotate" from="360 400 360" to="0 400 360" dur="310s" repeatCount="indefinite"/></circle>
+          <circle cx="400" cy="360" r="176" fill="none" stroke="var(--line)" stroke-width="13" stroke-dasharray="86 44 24 18 62 36"><animateTransform attributeName="transform" type="rotate" from="360 400 360" to="0 400 360" dur="70s" repeatCount="indefinite"/></circle>
+          <circle cx="400" cy="360" r="150" fill="none" stroke="var(--line-2)" stroke-width="7" stroke-dasharray="40 58 16 30 70 22"><animateTransform attributeName="transform" type="rotate" from="0 400 360" to="360 400 360" dur="52s" repeatCount="indefinite"/></circle>
+          <circle cx="400" cy="360" r="116" fill="none" stroke="var(--line-dim)" stroke-width="2"/>
+          <circle cx="400" cy="360" r="92" fill="none" stroke="var(--line)" stroke-width="10" stroke-dasharray="64 22 30 14 20 24"><animateTransform attributeName="transform" type="rotate" from="360 400 360" to="0 400 360" dur="38s" repeatCount="indefinite"/></circle>
+          <circle cx="400" cy="360" r="64" fill="none" stroke="var(--line)" stroke-width="6" stroke-dasharray="34 20 12 10 22 8"><animateTransform attributeName="transform" type="rotate" from="0 400 360" to="360 400 360" dur="28s" repeatCount="indefinite"/></circle>
+
+          <!-- radar sweep — driven by JS rAF (see bottom of file) so we can smoothly
+               interrupt the passive spin to "aim" at a hovered node. -->
+          <line class="sweep" id="sweep" x1="400" y1="360" x2="400" y2="64" stroke="var(--accent)" stroke-width="2"/>
+
+          <!-- band node dots -->
+          <g fill="var(--line)">
+            <circle cx="490" cy="450" r="6"/><circle cx="310" cy="450" r="6"/>
+            <circle cx="490" cy="270" r="6"/><circle cx="310" cy="270" r="6"/>
+            <circle cx="400" cy="232" r="5"/><circle cx="400" cy="488" r="5"/>
+            <circle cx="528" cy="360" r="5"/><circle cx="272" cy="360" r="5"/>
+          </g>
+          <g fill="var(--accent)"><circle cx="528" cy="360" r="3.5"/><circle cx="400" cy="232" r="3.5"/></g>
+          </g>
+          <!-- /DIAL -->
+
+          <!-- core -->
+          <circle cx="400" cy="360" r="50" fill="var(--bg)" stroke="var(--line)" stroke-width="3"/>
+          <circle cx="400" cy="360" r="36" fill="none" stroke="var(--line-dim)" stroke-width="1.5"/>
+          <text x="400" y="356" text-anchor="middle" font-family="var(--mono)" font-size="22" font-weight="700" fill="var(--line)">∴ AO</text>
+          <text x="400" y="378" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--ink-dim)" letter-spacing="2">core</text>
+
+          <!-- descending spine — sits below the outer ring so it no longer cuts through the dial -->
+          <g stroke="var(--line)" stroke-width="4" fill="none">
+            <line x1="395" y1="664" x2="395" y2="722"/><line x1="405" y1="664" x2="405" y2="722"/>
+          </g>
+          <line x1="376" y1="682" x2="424" y2="682" stroke="var(--line)" stroke-width="2"/>
+          <polygon points="400,714 414,723 414,743 400,752 386,743 386,723" fill="var(--line)"/>
+          <polygon points="400,721 408,726 408,740 400,745 392,740 392,726" fill="var(--bg)"/>
+          <line x1="400" y1="752" x2="400" y2="778" stroke="var(--line)" stroke-width="3"/>
+          <circle cx="400" cy="784" r="4" fill="var(--accent)"/>
+
+          <!-- flanking hex cells — shifted outward to clear the outer ring -->
+          <g stroke="var(--line-2)" stroke-width="1.5" fill="none">
+            <polygon points="62,360 76,351 90,360 90,378 76,387 62,378"/>
+            <polygon points="710,360 724,351 738,360 738,378 724,387 710,378"/>
+          </g>
+
+          <!-- terminal solder dots -->
+          <g fill="var(--line)"><circle cx="612" cy="148" r="8"/><circle cx="188" cy="148" r="8"/><circle cx="612" cy="572" r="8"/><circle cx="188" cy="572" r="8"/></g>
+
+          <!-- TERMINALS -->
+          <a class="term" href="blog.html" aria-label="blog">
+            <line class="tstub" x1="188" y1="148" x2="160" y2="116"/>
+            <circle class="tring" cx="160" cy="116" r="20"/>
+            <circle class="tnode" cx="160" cy="116" r="13"/>
+            <circle class="thole" cx="160" cy="116" r="4"/>
+            <text class="tlabel" x="160" y="76" text-anchor="middle" font-family="var(--mono)">blog</text>
+            <text class="tnum tnum-top" x="160" y="58" text-anchor="middle" font-family="var(--mono)">n01</text>
+            <circle class="hot" cx="160" cy="116" r="44"/>
+          </a>
+          <a class="term lit" href="player.html" aria-label="music">
+            <line class="tstub" x1="612" y1="148" x2="640" y2="116"/>
+            <circle class="mring tring" cx="640" cy="116" r="22" style="opacity:1"><animate attributeName="r" values="22;23.32;22" dur="2.6s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1" keyTimes="0;0.5;1"/><animate attributeName="opacity" values="0.55;1;0.55" dur="2.6s" repeatCount="indefinite" keyTimes="0;0.5;1"/></circle>
+            <circle class="tnode" cx="640" cy="116" r="14"/>
+            <circle class="thole" cx="640" cy="116" r="5" style="fill:var(--bg)"/>
+            <text class="tlabel" x="640" y="76" text-anchor="middle" font-family="var(--mono)">music</text>
+            <text class="tnum tnum-top tnum-full" x="640" y="58" text-anchor="middle" font-family="var(--mono)">n02 · 03 albums</text>
+            <text class="tnum tnum-top tnum-short" x="640" y="58" text-anchor="middle" font-family="var(--mono)">n02</text>
+            <circle class="hot" cx="640" cy="116" r="46"/>
+          </a>
+          <a class="term" href="gear.html" aria-label="gear">
+            <line class="tstub" x1="188" y1="572" x2="160" y2="604"/>
+            <circle class="tring" cx="160" cy="604" r="20"/>
+            <circle class="tnode" cx="160" cy="604" r="13"/>
+            <circle class="thole" cx="160" cy="604" r="4"/>
+            <text class="tlabel" x="160" y="648" text-anchor="middle" font-family="var(--mono)">gear</text>
+            <text class="tnum tnum-bot" x="160" y="666" text-anchor="middle" font-family="var(--mono)">n03</text>
+            <circle class="hot" cx="160" cy="604" r="44"/>
+          </a>
+          <a class="term" id="termLinks" href="#links" aria-label="links">
+            <line class="tstub" x1="612" y1="572" x2="640" y2="604"/>
+            <circle class="tring" cx="640" cy="604" r="20"/>
+            <circle class="tnode" cx="640" cy="604" r="13"/>
+            <circle class="thole" cx="640" cy="604" r="4"/>
+            <text class="tlabel" x="640" y="648" text-anchor="middle" font-family="var(--mono)">links</text>
+            <text class="tnum tnum-bot" x="640" y="666" text-anchor="middle" font-family="var(--mono)">n04</text>
+            <circle class="hot" cx="640" cy="604" r="44"/>
+          </a>
+        </g>
+        </g>
+      </svg>
+    </div>
+
+    <div class="tagline">postrock <b>·</b> ambient <b>·</b> lofi <b>·</b> texture</div>
+    <div class="hint">select a <span class="k">terminal</span> to enter</div>
+  </main>
+
+  <!-- links overlay -->
+  <div class="linkmodal" id="linkmodal">
+    <div class="linkbox panel">
+      <div class="panel-bar"><span class="t">:: external nodes ::</span><span class="btn" id="linkClose" style="padding:4px 9px">[ esc ]</span></div>
+      <div class="panel-bd">
+        <a class="linkrow" href="https://afterosmosis.bandcamp.com" target="_blank" rel="noopener"><span class="h">bandcamp</span><span class="a">releases ↗</span></a>
+        <a class="linkrow" href="https://instagram.com/afterosmosis" target="_blank" rel="noopener"><span class="h">instagram</span><span class="a">@afterosmosis ↗</span></a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <div class="links">
+      <a href="https://afterosmosis.bandcamp.com" target="_blank" rel="noopener">bandcamp ↗</a>
+      <a href="https://instagram.com/afterosmosis" target="_blank" rel="noopener">instagram ↗</a>
+    </div>
+    <div class="sig"><span class="dot"></span> hosted on neocities · est. 2026</div>
+  </footer>
+</div>
+
+<script src="eggs.js"></script>
+<script>
+  // links overlay
+  var lm=document.getElementById('linkmodal');
+  document.getElementById('termLinks').addEventListener('click',function(e){e.preventDefault();lm.classList.add('on');});
+  document.getElementById('linkClose').addEventListener('click',function(){lm.classList.remove('on');});
+  lm.addEventListener('click',function(e){if(e.target===lm)lm.classList.remove('on');});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')lm.classList.remove('on');});
+
+  // sigil responds to node hover: rings dial toward the node, accent sweep aims at it.
+  // Sweep is driven by rAF (not CSS animation) so we can smoothly interrupt the
+  // passive spin to point at a hovered terminal.
+  var svg=document.querySelector('.sig-svg');
+  var dial=document.getElementById('dial');
+  var sweep=document.getElementById('sweep');
+  // angle (deg, clockwise from north) from core(400,360) to each terminal node
+  var AIM={blog:-44, music:44, gear:-135, links:135};
+  // how far the ring stack turns toward each node (lower nodes turn a touch more)
+  var TURN={blog:-20, music:20, gear:-28, links:28};
+
+  var sweepAngle=0;          // current sweep angle in degrees
+  var aimTarget=null;        // null = passive spin; number = ease toward this angle
+  var lastT=performance.now();
+  var SPIN_MS=16000;         // one passive revolution per 16s (matches the old CSS)
+
+  function tick(t){
+    var dt=Math.min(t-lastT,64); lastT=t;
+    if(aimTarget!==null){
+      // approach target along the shorter arc, easing in
+      var diff=aimTarget-sweepAngle;
+      while(diff>180) diff-=360;
+      while(diff<-180) diff+=360;
+      sweepAngle += diff * Math.min(1, dt/220);
+    } else {
+      sweepAngle += dt * (360/SPIN_MS);
+    }
+    // normalize for cleanliness; doesn't affect rendering
+    if(sweepAngle>720||sweepAngle<-720) sweepAngle = ((sweepAngle%360)+360)%360;
+    sweep.setAttribute('transform','rotate('+sweepAngle.toFixed(3)+' 400 360)');
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(function(t){lastT=t;tick(t);});
+
+  function arm(key){
+    dial.style.transform='rotate('+TURN[key]+'deg)';
+    aimTarget=AIM[key];
+    svg.classList.add('aiming');
+  }
+  function disarm(){
+    dial.style.transform='';
+    aimTarget=null;
+    svg.classList.remove('aiming');
+  }
+  document.querySelectorAll('.term').forEach(function(t){
+    var key=t.getAttribute('aria-label');
+    t.addEventListener('mouseenter',function(){arm(key);});
+    t.addEventListener('mouseleave',disarm);
+    t.addEventListener('focus',function(){arm(key);});
+    t.addEventListener('blur',disarm);
+  });
+</script>
+</body>
+</html>

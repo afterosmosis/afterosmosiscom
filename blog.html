@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>blog — after osmosis</title>
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="stylesheet" href="theme.css">
+<script src="theme.js"></script>
+<style>
+  .page{position:relative;z-index:5;max-width:1080px;margin:0 auto;padding:96px 26px 0}
+  .crumb{display:flex;align-items:center;gap:12px;margin-bottom:22px;font-size:12px;letter-spacing:.1em;color:var(--ink-dim);white-space:nowrap}
+  .crumb .ring{width:20px;height:20px;flex:0 0 auto;animation:spin 40s linear infinite}
+  .crumb .t{color:var(--line)}
+  .crumb .blink{width:7px;height:14px;background:var(--accent);display:inline-block;animation:beat 1.1s steps(1) infinite}
+
+  .layout{display:grid;grid-template-columns:1fr 290px;gap:26px;align-items:start}
+  @media (max-width:880px){.layout{grid-template-columns:1fr}.aside{order:-1}}
+
+  /* post */
+  .post-header{margin-bottom:6px}
+  .post-title{font-size:23px;font-weight:700;color:var(--line);letter-spacing:.01em;line-height:1.3}
+  .post-date{font-size:11px;color:var(--accent);letter-spacing:.12em;margin-top:8px}
+  .ring-div{display:flex;align-items:center;gap:14px;margin:20px 0}
+  .ring-div .l{flex:1;height:1px;background:var(--line-dim)}
+  .ring-div svg{flex:0 0 auto}
+  .post-content{font-size:14px;line-height:1.95;color:var(--ink)}
+  .post-content p{margin-bottom:18px}
+  .post-content h2{font-size:13px;color:var(--accent);letter-spacing:.06em;margin:26px 0 10px;
+    display:flex;align-items:center;gap:9px}
+  .post-content h2::before{content:"";width:9px;height:9px;border:1.5px solid var(--accent);transform:rotate(45deg);flex:0 0 auto}
+  .loading,.error{padding:50px 0;text-align:center;color:var(--ink-dim);font-size:12px;letter-spacing:.08em}
+  .error{color:#d98a7a}
+
+  /* archive */
+  .arc-list{list-style:none;display:flex;flex-direction:column}
+  .arc{display:flex;gap:12px;align-items:flex-start;padding:13px 8px;cursor:pointer;
+    border-bottom:1px solid var(--line-dim);transition:background .18s,padding-left .18s}
+  .arc:last-child{border-bottom:none}
+  .arc:hover{background:rgba(95,179,196,.05);padding-left:13px}
+  .arc.active{background:rgba(95,179,196,.08)}
+  .arc .mk{flex:0 0 auto;margin-top:3px}
+  .arc .mk circle{transition:fill .2s,stroke .2s}
+  .arc.active .mk .core{fill:var(--accent)}
+  .arc.active .mk .o{stroke:var(--accent)}
+  .arc>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+  .arc .ti{font-size:12px;color:var(--line);line-height:1.45}
+  .arc .dt{font-size:10px;color:var(--ink-faint);letter-spacing:.1em}
+  .arc.active .ti{color:var(--accent)}
+
+  .seed{margin-top:16px;padding:12px;border:1px dashed var(--line-dim);font-size:10px;
+    color:var(--ink-faint);letter-spacing:.06em;line-height:1.7}
+
+  /* ---------- mobile layout ---------- */
+  @media (max-width:640px){
+    .page{padding:74px 12px 0}
+    .crumb{font-size:11px;letter-spacing:.06em;margin-bottom:14px}
+    .layout{gap:18px}
+    .panel-bd{padding:14px}
+    .post-title{font-size:19px;line-height:1.3}
+    .post-date{font-size:10px;letter-spacing:.1em;margin-top:6px}
+    .ring-div{margin:14px 0}
+    .post-content{font-size:13.5px;line-height:1.85}
+    .post-content p{margin-bottom:14px}
+    .post-content h2{font-size:12px;margin:20px 0 8px}
+    .arc{padding:11px 6px;gap:10px}
+    .arc:hover{padding-left:11px}
+    .arc .ti{font-size:12px}
+    .arc .dt{font-size:9.5px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9" stroke-dasharray="22 7 12 5"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>
+      <img class="wordmark" src="brand-wordmark.png" alt="after osmosis">
+    </a>
+    <div class="navmenu">
+      <button class="navbtn" type="button" aria-label="navigate to node">
+        <span class="nb-n">n01</span><span class="nb-l">blog</span><span class="nb-chev">▾</span>
+      </button>
+      <div class="navpop panel" role="menu">
+        <div class="pop-bar"><span class="t">:: nodes ::</span><span>[ esc ]</span></div>
+        <a href="index.html" role="menuitem"><span class="np-n">∴</span><span class="np-l">index</span><span class="np-a">sigil</span></a>
+        <a href="blog.html" class="cur" role="menuitem" aria-current="page"><span class="np-n">n01</span><span class="np-l">blog</span><span class="np-a">▸ here</span></a>
+        <a href="player.html" role="menuitem"><span class="np-n">n02</span><span class="np-l">music</span><span class="np-a">player</span></a>
+        <a href="gear.html" role="menuitem"><span class="np-n">n03</span><span class="np-l">gear</span><span class="np-a">rack</span></a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page" data-screen-label="blog">
+    <div class="crumb">
+      <svg class="ring" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6"><circle cx="12" cy="12" r="9" stroke-dasharray="20 6 10 5"/><circle cx="12" cy="12" r="3.5"/></svg>
+      <span>node 01 — <span class="t">log</span></span><span class="blink"></span>
+    </div>
+
+    <div class="layout">
+      <section class="panel">
+        <div class="panel-bar"><span class="t">log // transmission</span><span id="entryCount">— entries</span></div>
+        <div class="panel-bd">
+          <div id="post"><div class="loading">retrieving transmission…</div></div>
+        </div>
+      </section>
+
+      <aside class="aside panel">
+        <div class="panel-bar"><span class="t">archive</span><span>[ - ]</span></div>
+        <div class="panel-bd" style="padding:6px">
+          <ul class="arc-list" id="arcList"><li class="loading" style="padding:24px 8px">…</li></ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="links">
+      <a href="https://afterosmosis.bandcamp.com" target="_blank" rel="noopener">bandcamp ↗</a>
+      <a href="https://instagram.com/afterosmosis" target="_blank" rel="noopener">instagram ↗</a>
+    </div>
+    <div class="sig"><span class="dot"></span> hosted on neocities · est. 2026</div>
+  </footer>
+</div>
+
+<script src="eggs.js"></script>
+<script>
+  const postEl = document.getElementById('post');
+  const arcEl  = document.getElementById('arcList');
+  const countEl= document.getElementById('entryCount');
+  const divider= '<div class="ring-div"><div class="l"></div><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="var(--accent)" stroke-width="1.4"><circle cx="11" cy="11" r="8" stroke-dasharray="18 5 9 4"/><circle cx="11" cy="11" r="3"/></svg><div class="l"></div></div>';
+  const mkSvg  = '<svg class="mk" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle class="o" cx="8" cy="8" r="6" stroke="var(--line-2)" stroke-width="1.4" stroke-dasharray="14 5"/><circle class="core" cx="8" cy="8" r="2.2" fill="var(--line-2)"/></svg>';
+
+  // human-readable date from YYYYMMDD when manifest omits it
+  function prettyDate(id){
+    if(!/^\d{8}$/.test(id)) return id;
+    return id.slice(0,4)+'.'+id.slice(4,6)+'.'+id.slice(6,8);
+  }
+
+  async function loadIndex(){
+    const res = await fetch('posts/index.json', {cache:'no-cache'});
+    if(!res.ok) throw new Error('index.json '+res.status);
+    return res.json();
+  }
+
+  function renderArchive(posts, activeId){
+    arcEl.innerHTML = posts.map(p=>{
+      const active = p.id===activeId ? ' active' : '';
+      return '<li class="arc'+active+'" data-id="'+p.id+'">'+mkSvg+
+        '<div><div class="ti">'+p.title+'</div><div class="dt">'+(p.date||prettyDate(p.id))+'</div></div></li>';
+    }).join('');
+    countEl.textContent = String(posts.length).padStart(3,'0')+' entries';
+    arcEl.querySelectorAll('.arc').forEach(a=>{
+      a.addEventListener('click', ()=>{ history.replaceState(null,'','#'+a.dataset.id); loadPost(a.dataset.id, posts); });
+    });
+  }
+
+  async function loadPost(id, posts){
+    const meta = posts.find(p=>p.id===id);
+    if(!meta){
+      postEl.innerHTML = '<div class="error">// transmission lost — entry not found.</div>';
+      return;
+    }
+    arcEl.querySelectorAll('.arc').forEach(a=>a.classList.toggle('active', a.dataset.id===id));
+    postEl.innerHTML = '<div class="loading">retrieving transmission…</div>';
+    try{
+      const res = await fetch('posts/'+id+'.html', {cache:'no-cache'});
+      if(!res.ok) throw new Error(res.status);
+      const body = await res.text();
+      const header = '<div class="post-header"><h1 class="post-title">'+meta.title+'</h1>'+
+                     '<div class="post-date">'+id+'</div></div>';
+      postEl.innerHTML = header + divider + '<div class="post-content">'+body+'</div>';
+      window.scrollTo(0,0);
+    }catch(err){
+      postEl.innerHTML = '<div class="error">// transmission lost — '+err.message+'</div>';
+    }
+  }
+
+  (async ()=>{
+    try{
+      const posts = await loadIndex();
+      if(!posts.length){
+        postEl.innerHTML = '<div class="loading">// no entries yet.</div>';
+        arcEl.innerHTML = '';
+        countEl.textContent = '000 entries';
+        return;
+      }
+      const hashId = location.hash.replace('#','');
+      const startId = posts.find(p=>p.id===hashId) ? hashId : posts[0].id;
+      renderArchive(posts, startId);
+      loadPost(startId, posts);
+      window.addEventListener('hashchange', ()=>{
+        const id = location.hash.replace('#','');
+        if(posts.find(p=>p.id===id)) loadPost(id, posts);
+      });
+    }catch(err){
+      postEl.innerHTML = '<div class="error">// archive index unreachable — '+err.message+'</div>';
+      arcEl.innerHTML = '';
+    }
+  })();
+</script>
+</body>
+</html>

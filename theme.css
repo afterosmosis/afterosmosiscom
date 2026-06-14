@@ -1,0 +1,257 @@
+/* ============================================================
+   after osmosis — cyber sigil theme
+   blackwork inverted: bone linework + cyan signal on near-black
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+:root{
+  --bg:#0b0c0f;
+  --bg-2:#101319;
+  --panel:#0e1014;
+  --line:#e9e5d8;        /* bone — the "ink" of the blackwork */
+  --line-2:#9aa0a8;      /* secondary linework */
+  --line-dim:#3a3f47;    /* faint structure */
+  --ink:#c7cbd2;         /* body text */
+  --ink-dim:#7b8089;     /* muted text */
+  --ink-faint:#565b64;
+  --accent:#5fb3c4;      /* signal cyan */
+  --accent-2:#2f6b76;    /* dim cyan */
+  --accent-glow:rgba(95,179,196,.45);
+  --hair:rgba(233,229,216,.14);
+  --mono:'Space Mono',ui-monospace,monospace;
+}
+
+/* light mode — blackwork returns to dark ink on warm paper (like the real tattoo) */
+html[data-theme="light"]{
+  --bg:#e7e2d4;
+  --bg-2:#ded8c7;
+  --panel:#f1ede2;
+  --line:#16181c;        /* dark ink linework */
+  --line-2:#5a5f66;
+  --line-dim:#b9b3a2;     /* faint structure */
+  --ink:#23252a;         /* body text */
+  --ink-dim:#6a6e74;
+  --ink-faint:#9a9485;
+  --accent:#71499b;      /* signal shifts to deep violet on paper */
+  --accent-2:#b9a0d6;
+  --accent-glow:rgba(113,73,155,.30);
+  --hair:rgba(22,24,28,.10);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--mono);
+  background:var(--bg);
+  color:var(--ink);
+  min-height:100vh;
+  text-transform:lowercase;
+  font-size:14px;
+  line-height:1.6;
+  letter-spacing:.01em;
+  position:relative;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* subtle techy texture — fine grid + vignette + faint scanline. NOT heavy CRT. */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+  background-image:
+    linear-gradient(var(--hair) 1px,transparent 1px),
+    linear-gradient(90deg,var(--hair) 1px,transparent 1px);
+  background-size:48px 48px;
+  -webkit-mask-image:radial-gradient(circle at 50% 38%,#000 0%,transparent 78%);
+          mask-image:radial-gradient(circle at 50% 38%,#000 0%,transparent 78%);
+  opacity:.5;
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:2;
+  background:
+    radial-gradient(120% 90% at 50% 0%,transparent 55%,rgba(0,0,0,.55) 100%),
+    repeating-linear-gradient(0deg,rgba(0,0,0,0) 0 2px,rgba(0,0,0,.05) 2px 3px);
+}
+html[data-theme="light"] body::after{
+  background:radial-gradient(120% 92% at 50% 0%,transparent 60%,rgba(120,108,84,.13) 100%);
+}
+.wrap{position:relative;z-index:5}
+::selection{background:var(--accent);color:#f1ede2}
+a{color:inherit}
+
+/* ---------- shared top bar ---------- */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:40;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 26px;
+  background:linear-gradient(180deg,var(--bg) 40%,transparent);
+}
+.brand{
+  display:flex;align-items:center;gap:11px;white-space:nowrap;
+  text-decoration:none;color:var(--line);
+  font-weight:700;letter-spacing:.06em;font-size:14px;
+}
+.brand .glyph{width:17px;height:17px;display:block;flex:0 0 auto}
+.brand .wordmark{height:11px;width:auto;max-width:54vw;display:block;transition:filter .18s}
+.brand:hover .glyph{color:var(--accent)}
+.brand:hover .wordmark{filter:drop-shadow(0 0 7px var(--accent-glow))}
+/* light/dark wordmark — src swapped by theme.js */
+/* right cluster + theme toggle */
+.rightcluster{display:flex;align-items:center;gap:14px}
+.theme-toggle{
+  width:32px;height:28px;flex:0 0 auto;display:grid;place-items:center;cursor:pointer;
+  background:transparent;border:1px solid var(--line-dim);color:var(--ink-dim);
+  transition:color .18s,border-color .18s;
+}
+.theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+.theme-toggle svg{display:block;width:15px;height:15px}
+.brand:hover{color:var(--accent)}
+
+.nav{display:flex;gap:4px;align-items:center}
+.nav a{
+  text-decoration:none;color:var(--ink-dim);
+  font-size:12px;letter-spacing:.08em;
+  padding:7px 13px;border:1px solid transparent;
+  transition:color .18s,border-color .18s,background .18s;
+  position:relative;
+}
+.nav a:hover{color:var(--line)}
+.nav a.active{color:var(--accent);border-color:var(--accent-2)}
+.nav a.active::before{content:"▸ "}
+
+/* ---------- node menu (subpage nav: compact button + popover) ---------- */
+.navmenu{position:relative}
+.navbtn{
+  font-family:var(--mono);font-size:12px;letter-spacing:.08em;
+  color:var(--line);background:transparent;
+  border:1px solid var(--line-dim);
+  padding:7px 11px;cursor:pointer;text-transform:lowercase;
+  display:inline-flex;align-items:center;gap:9px;
+  transition:color .18s,border-color .18s,background .18s;
+}
+.navbtn:hover,.navbtn[aria-expanded="true"]{color:var(--accent);border-color:var(--accent-2);background:rgba(95,179,196,.05)}
+html[data-theme="light"] .navbtn:hover,html[data-theme="light"] .navbtn[aria-expanded="true"]{background:rgba(113,73,155,.05)}
+.navbtn .nb-n{color:var(--accent);font-size:10px;letter-spacing:.14em}
+.navbtn .nb-l{color:var(--line)}
+.navbtn .nb-chev{font-size:8px;color:var(--ink-faint);transition:transform .22s,color .22s}
+.navbtn[aria-expanded="true"] .nb-chev{transform:rotate(180deg);color:var(--accent)}
+
+.navmenu .navpop{
+  position:absolute;top:calc(100% + 9px);right:0;
+  width:260px;background:var(--panel);
+  box-shadow:0 22px 50px rgba(0,0,0,.45);
+  opacity:0;pointer-events:none;transform:translateY(-6px);
+  transition:opacity .18s,transform .18s;
+  z-index:50;
+}
+html[data-theme="light"] .navmenu .navpop{box-shadow:0 22px 50px rgba(80,70,50,.24)}
+.navmenu .navpop.on{opacity:1;pointer-events:auto;transform:translateY(0)}
+.navpop .pop-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:9px 12px;border-bottom:1px solid var(--line-dim);
+  font-size:10px;letter-spacing:.14em;color:var(--ink-faint);
+}
+.navpop .pop-bar .t{color:var(--accent)}
+.navpop a{
+  display:flex;align-items:center;gap:12px;padding:11px 14px;
+  text-decoration:none;color:var(--line);
+  border-bottom:1px solid var(--line-dim);
+  font-size:13px;letter-spacing:.06em;
+  transition:background .15s,color .15s,padding-left .15s;
+}
+.navpop a:last-child{border-bottom:none}
+.navpop a:hover{color:var(--accent);padding-left:20px;background:rgba(95,179,196,.04)}
+html[data-theme="light"] .navpop a:hover{background:rgba(113,73,155,.04)}
+.navpop a .np-n{
+  font-size:10px;letter-spacing:.12em;color:var(--ink-faint);
+  width:34px;flex:0 0 auto;
+}
+.navpop a:hover .np-n{color:var(--accent-2)}
+.navpop a .np-l{flex:1}
+.navpop a .np-a{font-size:10px;color:var(--ink-faint);letter-spacing:.06em}
+.navpop a.cur{color:var(--accent);background:rgba(95,179,196,.05)}
+html[data-theme="light"] .navpop a.cur{background:rgba(113,73,155,.05)}
+.navpop a.cur .np-n,.navpop a.cur .np-a{color:var(--accent)}
+.navpop a.cur:hover{padding-left:14px;cursor:default}
+
+/* ---------- panel (blackwork bordered container) ---------- */
+.panel{
+  position:relative;
+  border:1px solid var(--line-dim);
+  background:linear-gradient(180deg,rgba(255,255,255,.012),transparent);
+}
+.panel::before,.panel::after{
+  content:"";position:absolute;width:13px;height:13px;pointer-events:none;
+  border:2px solid var(--line);
+}
+.panel::before{top:-1px;left:-1px;border-right:none;border-bottom:none}
+.panel::after{bottom:-1px;right:-1px;border-left:none;border-top:none}
+.panel-bar{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:10px 14px;border-bottom:1px solid var(--line-dim);
+  font-size:11px;letter-spacing:.1em;color:var(--ink-dim);
+}
+.panel-bar span{white-space:nowrap}
+.panel-bar .t{color:var(--accent)}
+.panel-bd{padding:18px}
+
+/* ---------- buttons ---------- */
+.btn{
+  font-family:var(--mono);font-size:12px;letter-spacing:.06em;
+  color:var(--line);background:transparent;
+  border:1px solid var(--line-dim);
+  padding:9px 14px;cursor:pointer;text-transform:lowercase;
+  transition:border-color .18s,color .18s,background .18s;
+  display:inline-flex;align-items:center;gap:8px;
+  white-space:nowrap;
+}
+.btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(95,179,196,.06)}
+.btn:active{background:rgba(95,179,196,.14)}
+
+/* ---------- shared footer ---------- */
+.foot{
+  position:relative;z-index:5;
+  max-width:1100px;margin:64px auto 0;padding:22px 26px 40px;
+  border-top:1px solid var(--line-dim);
+  display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between;
+}
+.foot .links{display:flex;gap:18px;flex-wrap:wrap}
+.foot .links a{
+  text-decoration:none;color:var(--ink-dim);font-size:12px;letter-spacing:.05em;
+  transition:color .18s;
+}
+.foot .links a:hover{color:var(--accent)}
+.foot .sig{font-size:11px;color:var(--ink-faint);letter-spacing:.08em;display:flex;align-items:center;gap:9px}
+.foot .sig .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);animation:beat 2.4s ease-in-out infinite}
+
+/* ---------- generic helpers ---------- */
+.mono-label{font-size:11px;letter-spacing:.14em;color:var(--ink-faint);text-transform:uppercase;white-space:nowrap}
+.hair{height:1px;background:var(--line-dim);border:none}
+.accent{color:var(--accent)}
+.glow{text-shadow:0 0 10px var(--accent-glow)}
+
+/* ---------- motion ---------- */
+@keyframes beat{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spin-rev{to{transform:rotate(-360deg)}}
+@keyframes pulse-ring{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+@keyframes flicker{0%,100%{opacity:1}48%{opacity:1}49%{opacity:.4}50%{opacity:1}92%{opacity:1}93%{opacity:.6}94%{opacity:1}}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important}
+  html{scroll-behavior:auto}
+}
+
+@media (max-width:640px){
+  body{font-size:13px}
+  .topbar{padding:12px 14px}
+  .brand .wordmark{height:9px}
+  .nav a{padding:6px 9px;font-size:11px;letter-spacing:.04em}
+  .navbtn{padding:7px 10px;gap:7px;font-size:11px}
+  .navbtn .nb-n{font-size:9.5px}
+  .navpop,.navmenu .navpop{width:min(280px,calc(100vw - 28px));right:0}
+  .foot{padding:20px 16px 32px}
+}
+@media (max-width:380px){
+  .navbtn .nb-l{display:none}
+  .navbtn{gap:6px;padding:7px 9px}
+}

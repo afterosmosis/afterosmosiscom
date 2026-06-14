@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>music — after osmosis</title>
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="stylesheet" href="theme.css">
+<script src="theme.js"></script>
+<style>
+  .page{position:relative;z-index:5;max-width:920px;margin:0 auto;padding:96px 26px 0}
+  .crumb{display:flex;align-items:center;gap:12px;margin-bottom:22px;font-size:12px;letter-spacing:.1em;color:var(--ink-dim);white-space:nowrap}
+  .crumb .ring{width:20px;height:20px;flex:0 0 auto;animation:spin 40s linear infinite}
+  .crumb .t{color:var(--line)}.crumb .blink{width:7px;height:14px;background:var(--accent);display:inline-block;animation:beat 1.1s steps(1) infinite}
+
+  /* album list */
+  .album{border-bottom:1px solid var(--line-dim)}
+  .album:last-of-type{border-bottom:none}
+  .album-hd{display:flex;align-items:center;gap:14px;padding:15px 8px;cursor:pointer;transition:background .18s,padding-left .18s}
+  .album-hd:hover{background:rgba(95,179,196,.05);padding-left:14px}
+  .album.open .album-hd{background:rgba(95,179,196,.07)}
+  .album .mk{flex:0 0 auto}
+  .album .mk circle{transition:fill .2s,stroke .2s}
+  .album.open .mk .o{stroke:var(--accent)}.album.open .mk .core{fill:var(--accent)}
+  .album-ti{flex:1;font-size:14px;color:var(--line);letter-spacing:.02em}
+  .album.open .album-ti{color:var(--accent)}
+  .album-ct{font-size:10px;color:var(--ink-faint);letter-spacing:.1em;white-space:nowrap}
+  .track-name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tracks{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .album.open .tracks{max-height:600px}
+  .track{display:flex;align-items:center;gap:14px;padding:11px 8px 11px 44px;cursor:pointer;
+    font-size:13px;color:var(--ink);transition:color .18s,background .18s}
+  .track:hover{color:var(--line);background:rgba(255,255,255,.02)}
+  .track .tn{font-size:11px;color:var(--ink-faint);min-width:22px}
+  .track.playing{color:var(--accent)}
+  .track.playing .tn{color:var(--accent)}
+  .track .eq{margin-left:auto;display:none;gap:2px;align-items:flex-end;height:13px}
+  .track.playing .eq{display:flex}
+  .track .eq span{width:2.5px;background:var(--accent);animation:eq .9s ease-in-out infinite}
+  .track .eq span:nth-child(2){animation-delay:.2s}.track .eq span:nth-child(3){animation-delay:.4s}.track .eq span:nth-child(4){animation-delay:.1s}
+  @keyframes eq{0%,100%{height:3px}50%{height:13px}}
+
+  /* now playing */
+  .np{margin-top:22px;display:none}
+  .np.on{display:block}
+  .np-grid{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+  .np-art{position:relative;width:122px;height:122px;flex:0 0 auto}
+  .np-art img{width:100%;height:100%;object-fit:cover;display:block;background:#050608;border:1px solid var(--line-dim);filter:brightness(1.1) contrast(1.04)}
+  .np-art .frame{position:absolute;inset:0;pointer-events:none}
+  .np-art .frame i{position:absolute;width:13px;height:13px;border:1.5px solid var(--line)}
+  .np-art .frame .a{top:-1px;left:-1px;border-right:none;border-bottom:none}
+  .np-art .frame .b{top:-1px;right:-1px;border-left:none;border-bottom:none}
+  .np-art .frame .c{bottom:-1px;left:-1px;border-right:none;border-top:none}
+  .np-art .frame .d{bottom:-1px;right:-1px;border-left:none;border-top:none}
+  .np.playing .np-art .frame i{border-color:var(--accent)}
+  .np-art .spinner{position:absolute;right:-10px;bottom:-10px;width:30px;height:30px;background:var(--bg);border-radius:50%;display:grid;place-items:center}
+  .np-art .spinner svg{animation:spin 4s linear infinite;animation-play-state:paused;transform-box:view-box;transform-origin:13px 13px}
+  .np.playing .spinner svg{animation-play-state:running}
+  .np-art.noart img{opacity:0}
+  .np-art.noart::after{content:"∴";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--line-2)}
+  .np-meta{flex:1;min-width:200px}
+  .np-track{font-size:16px;color:var(--line);letter-spacing:.02em}
+  .np-track.err{color:#d97a5a}
+  .np.playing .np-track.err{color:#d97a5a}
+  .np-album{font-size:11px;color:var(--ink-dim);letter-spacing:.1em;margin-top:5px}
+  .wave{display:flex;align-items:center;gap:2px;height:42px;margin:16px 0 6px;cursor:pointer}
+  .wave .b{flex:1;background:var(--line-dim);min-height:3px;transition:background .12s}
+  .wave .b.buf{background:var(--line-2)}
+  .wave .b.on{background:var(--accent)}
+  .time{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-faint);letter-spacing:.08em}
+  .ctrls{display:flex;gap:9px;margin-top:16px;flex-wrap:wrap;align-items:center}
+  #playBtn.load{position:relative;overflow:hidden;color:var(--ink-dim)}
+  #playBtn.load::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(95,179,196,.18),transparent);transform:translateX(-100%);animation:shimmer 1.1s linear infinite}
+  @keyframes shimmer{to{transform:translateX(100%)}}
+  .np.loading .np-track::after{content:" • loading…";color:var(--ink-dim);font-size:11px;letter-spacing:.08em}
+  .vol{display:flex;align-items:center;gap:9px;margin-left:auto;font-size:10px;color:var(--ink-dim)}
+  .vol input{accent-color:var(--accent);width:96px}
+  /* fixed-width volume readout so the row doesn't reshuffle when digit count changes (0 / 70 / 100) */
+  .vol #volV{display:inline-block;width:2.4em;text-align:right;font-variant-numeric:tabular-nums}
+  @media (max-width:560px){.vol{display:none}}
+
+  /* ---------- mobile layout ---------- */
+  @media (max-width:640px){
+    .page{padding:74px 12px 0}
+    .crumb{font-size:11px;letter-spacing:.06em;margin-bottom:14px}
+    .album-hd{padding:13px 6px;gap:11px}
+    .album-ti{font-size:13px;line-height:1.4}
+    .track{padding:10px 6px 10px 32px;gap:10px;font-size:12.5px}
+    .np{margin-top:18px}
+    .np-grid{gap:14px}
+    .np-art{width:96px;height:96px}
+    .np-art .spinner{width:24px;height:24px;right:-8px;bottom:-8px}
+    .np-meta{min-width:0;width:100%}
+    .np-track{font-size:14px}
+    .wave{height:36px;margin:12px 0 4px}
+    .ctrls{gap:7px;margin-top:14px;flex-wrap:nowrap}
+    .ctrls .btn{padding:11px 0;font-size:14px;flex:1 1 0;min-width:0;justify-content:center;gap:0}
+    .ctrls .btn .lbl{display:none}
+    .ctrls .btn .ico{font-size:14px;line-height:1}
+    .help{font-size:9.5px;margin-top:22px;line-height:1.7}
+    .help br{display:none}
+    .help span.accent{display:block;margin-top:4px}
+  }
+
+  .help{margin-top:28px;text-align:center;font-size:10px;color:var(--ink-faint);letter-spacing:.08em;line-height:1.8}
+  .toast{position:fixed;right:18px;bottom:18px;z-index:70;display:none;max-width:250px;
+    border:1px solid var(--accent);background:var(--bg);padding:13px 16px;font-size:10px;color:var(--accent);
+    letter-spacing:.06em;line-height:1.8;box-shadow:0 0 24px rgba(95,179,196,.18)}
+  .toast.on{display:block;animation:siglin .4s ease}
+  .toast .l{color:var(--ink-dim);font-size:9px;display:block;margin-bottom:5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9" stroke-dasharray="22 7 12 5"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>
+      <img class="wordmark" src="brand-wordmark.png" alt="after osmosis">
+    </a>
+    <div class="navmenu">
+      <button class="navbtn" type="button" aria-label="navigate to node">
+        <span class="nb-n">n02</span><span class="nb-l">music</span><span class="nb-chev">▾</span>
+      </button>
+      <div class="navpop panel" role="menu">
+        <div class="pop-bar"><span class="t">:: nodes ::</span><span>[ esc ]</span></div>
+        <a href="index.html" role="menuitem"><span class="np-n">∴</span><span class="np-l">index</span><span class="np-a">sigil</span></a>
+        <a href="blog.html" role="menuitem"><span class="np-n">n01</span><span class="np-l">blog</span><span class="np-a">transmission</span></a>
+        <a href="player.html" class="cur" role="menuitem" aria-current="page"><span class="np-n">n02</span><span class="np-l">music</span><span class="np-a">▸ here</span></a>
+        <a href="gear.html" role="menuitem"><span class="np-n">n03</span><span class="np-l">gear</span><span class="np-a">rack</span></a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page" data-screen-label="music">
+    <div class="crumb">
+      <svg class="ring" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6"><circle cx="12" cy="12" r="9" stroke-dasharray="20 6 10 5"/><circle cx="12" cy="12" r="3.5"/></svg>
+      <span>node 02 — <span class="t">music</span></span><span class="blink"></span>
+    </div>
+
+    <section class="panel">
+      <div class="panel-bar"><span class="t">library // releases</span><span id="libCount">03 albums</span></div>
+      <div class="panel-bd" style="padding:6px" id="albumList"></div>
+    </section>
+
+    <section class="np panel" id="np">
+      <div class="panel-bar"><span class="t">▶ now playing</span><span>out // stereo</span></div>
+      <div class="panel-bd">
+        <div class="np-grid">
+          <div class="np-art noart" id="npArt">
+            <img id="npImg" alt="">
+            <div class="frame"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+            <div class="spinner"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="10" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="20 8 10 6"/><circle cx="13" cy="13" r="3" fill="var(--accent)"/></svg></div>
+          </div>
+          <div class="np-meta">
+            <div class="np-track" id="npTrack">—</div>
+            <div class="np-album" id="npAlbum">—</div>
+            <div class="wave" id="wave"></div>
+            <div class="time"><span id="tCur">0:00</span><span id="tDur">0:00</span></div>
+          </div>
+        </div>
+        <div class="ctrls">
+          <button class="btn" id="playBtn"><span class="ico">▶</span><span class="lbl">play</span></button>
+          <button class="btn" id="prevBtn"><span class="ico">⏮</span><span class="lbl">prev</span></button>
+          <button class="btn" id="nextBtn"><span class="lbl">next</span><span class="ico">⏭</span></button>
+          <button class="btn" id="stopBtn"><span class="ico">■</span><span class="lbl">stop</span></button>
+          <div class="vol"><span>vol</span><input type="range" min="0" max="100" value="70" id="vol"><span id="volV">70</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="help">space play/pause · ← → prev/next · ↑ ↓ volume<br>// audio streams from <span class="accent">music/&lt;album&gt;/&lt;track&gt;.mp3</span></div>
+  </main>
+
+  <footer class="foot">
+    <div class="links">
+      <a href="https://afterosmosis.bandcamp.com" target="_blank" rel="noopener">bandcamp ↗</a>
+      <a href="https://instagram.com/afterosmosis" target="_blank" rel="noopener">instagram ↗</a>
+    </div>
+    <div class="sig"><span class="dot"></span> hosted on neocities · est. 2026</div>
+  </footer>
+</div>
+
+<div class="toast" id="toast"><span class="l">[ transmission unlocked ]</span>hidden track added to library</div>
+<audio id="audio"></audio>
+
+<script src="eggs.js"></script>
+<script>
+const albums=[
+  {title:"after osmosis ep",cover:"images/covers/after-osmosis-ep.jpg",tracks:[
+    {name:"moment of truth",file:"music/after-osmosis-ep/01-moment-of-truth.mp3"},
+    {name:"strange byrd",file:"music/after-osmosis-ep/02-strange-byrd.mp3"},
+    {name:"perpetual",file:"music/after-osmosis-ep/03-perpetual.mp3"},
+    {name:"a hero's rampage",file:"music/after-osmosis-ep/04-a-heros-rampage.mp3"}]},
+  {title:"what do you see when you dream?",cover:"images/covers/wdyswyd.jpg",tracks:[
+    {name:"what do you see when you dream?",file:"music/wdyswyd/01-what-do-you-see-when-you-dream.mp3"},
+    {name:"is it darkness, or is it light",file:"music/wdyswyd/02-is-it-darkness-or-is-it-light.mp3"},
+    {name:"images of days gone by",file:"music/wdyswyd/03-images-of-days-gone-by.mp3"},
+    {name:"distant loved ones",file:"music/wdyswyd/04-distant-loved-ones.mp3"},
+    {name:"a favorite place",file:"music/wdyswyd/05-a-favorite-place.mp3"},
+    {name:"reliving a fear you faced",file:"music/wdyswyd/06-reliving-a-fear-you-faced.mp3"},
+    {name:"whatever you see, hold on tight",file:"music/wdyswyd/07-whatever-you-see-hold-on-tight.mp3"},
+    {name:"this dream only lasts the night",file:"music/wdyswyd/08-this-dream-only-lasts-the-night.mp3"}]},
+  {title:"slow release",cover:"images/covers/slow-release.png",tracks:[
+    {name:"dead channel",file:"music/slow-release/01-dead-channel.mp3"},
+    {name:"painted clouds",file:"music/slow-release/02-painted-clouds.mp3"},
+    {name:"summer child",file:"music/slow-release/03-summer-child.mp3"},
+    {name:"prediction machines",file:"music/slow-release/04-prediction-machines.mp3"}]}
+];
+
+const audio=document.getElementById('audio');
+const listEl=document.getElementById('albumList');
+const np=document.getElementById('np');
+const playBtn=document.getElementById('playBtn');
+let curA=null,curT=null;
+
+function mk(open){return '<svg class="mk" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle class="o" cx="9" cy="9" r="7" stroke="var(--line-2)" stroke-width="1.5" stroke-dasharray="16 5 9 4"/><circle class="core" cx="9" cy="9" r="2.4" fill="var(--line-2)"/></svg>';}
+
+function render(){
+  listEl.innerHTML='';
+  albums.forEach((al,ai)=>{
+    const d=document.createElement('div');d.className='album'+(ai===0?' open':'');
+    d.innerHTML='<div class="album-hd">'+mk()+'<span class="album-ti">'+al.title+'</span><span class="album-ct">'+String(al.tracks.length).padStart(2,'0')+' trk</span></div>'+
+      '<div class="tracks">'+al.tracks.map((t,ti)=>'<div class="track" data-a="'+ai+'" data-t="'+ti+'"><span class="tn">'+String(ti+1).padStart(2,'0')+'</span><span class="track-name">'+t.name+'</span><span class="eq"><span></span><span></span><span></span><span></span></span></div>').join('')+'</div>';
+    d.querySelector('.album-hd').addEventListener('click',()=>{
+      const wasOpen=d.classList.contains('open');
+      document.querySelectorAll('.album').forEach(x=>x.classList.remove('open'));
+      if(!wasOpen)d.classList.add('open');
+    });
+    d.querySelectorAll('.track').forEach(tr=>tr.addEventListener('click',()=>play(+tr.dataset.a,+tr.dataset.t)));
+    listEl.appendChild(d);
+  });
+}
+
+// waveform (seeded pseudo-random so it's stable per track)
+let waveBars=[];
+function buildWave(seed){
+  const w=document.getElementById('wave');w.innerHTML='';waveBars=[];
+  let s=seed*9301+49297;
+  for(let i=0;i<72;i++){
+    s=(s*9301+49297)%233280;const r=s/233280;
+    const h=18+Math.pow(r,0.6)*82;
+    const b=document.createElement('div');b.className='b';b.style.height=h+'%';
+    b.addEventListener('click',()=>{if(audio.duration)audio.currentTime=(i/72)*audio.duration;});
+    w.appendChild(b);waveBars.push(b);
+  }
+}
+
+let playToken=0;
+function setBtn(state){
+  const map={loading:['…','loading'],playing:['❚❚','pause'],paused:['▶','play']};
+  const [ico,lbl]=map[state]||map.paused;
+  playBtn.querySelector('.ico').textContent=ico;
+  playBtn.querySelector('.lbl').textContent=lbl;
+  playBtn.classList.toggle('load',state==='loading');
+  np.classList.toggle('playing',state==='playing');
+  np.classList.toggle('loading',state==='loading');
+}
+function tryPlay(srcLabel){
+  const my=++playToken;
+  setBtn('loading');
+  return audio.play().catch(err=>{
+    if(my!==playToken)return;                       // superseded
+    if(err&&err.name==='AbortError')return;         // pause() during pending play() — ignore
+    showErr(srcLabel||audio.src,err&&err.message||'play() rejected');
+  });
+}
+function play(ai,ti){
+  curA=ai;curT=ti;const al=albums[ai],t=al.tracks[ti];
+  document.getElementById('npTrack').classList.remove('err');
+  audio.src=t.file;
+  tryPlay(t.file);
+  document.getElementById('npTrack').textContent=t.name;
+  document.getElementById('npAlbum').textContent=al.title;
+  var npArt=document.getElementById('npArt'),npImg=document.getElementById('npImg');
+  if(al.cover){npImg.src=al.cover;npArt.classList.remove('noart');}else{npImg.removeAttribute('src');npArt.classList.add('noart');}
+  np.classList.add('on');
+  buildWave((ai+1)*100+ti+1);
+  // open the album & highlight
+  document.querySelectorAll('.album').forEach((x,i)=>x.classList.toggle('open',i===ai));
+  document.querySelectorAll('.track').forEach(tr=>tr.classList.toggle('playing',+tr.dataset.a===ai&&+tr.dataset.t===ti));
+}
+function togglePlay(){if(!audio.src)return;if(audio.paused){tryPlay();}else{audio.pause();}}
+function stop(){playToken++;audio.pause();audio.currentTime=0;setBtn('paused');}
+function next(){if(curA===null)return;let a=curA,t=curT+1;if(t>=albums[a].tracks.length){a++;t=0;if(a>=albums.length)a=0;}play(a,t);}
+function prev(){if(curA===null)return;let a=curA,t=curT-1;if(t<0){a--;if(a<0)a=albums.length-1;t=albums[a].tracks.length-1;}play(a,t);}
+
+function paintBars(){
+  const d=audio.duration||1,p=audio.currentTime/d,n=waveBars.length;
+  // mark buffered ranges
+  const buf=audio.buffered;const bufFrac=[];for(let i=0;i<buf.length;i++)bufFrac.push([buf.start(i)/d,buf.end(i)/d]);
+  waveBars.forEach((b,i)=>{
+    const f=i/n;
+    const played=f<=p;
+    const buffered=!played&&bufFrac.some(r=>f>=r[0]&&f<=r[1]);
+    b.classList.toggle('on',played);
+    b.classList.toggle('buf',buffered);
+  });
+}
+audio.addEventListener('timeupdate',()=>{
+  paintBars();
+  document.getElementById('tCur').textContent=fmt(audio.currentTime);
+  document.getElementById('tDur').textContent=fmt(audio.duration);
+});
+audio.addEventListener('progress',paintBars);
+audio.addEventListener('loadstart',()=>{if(audio.src)setBtn('loading');});
+audio.addEventListener('waiting',()=>{if(!audio.paused)setBtn('loading');});
+audio.addEventListener('playing',()=>setBtn('playing'));
+audio.addEventListener('pause',()=>{if(!audio.ended)setBtn('paused');});
+audio.addEventListener('ended',next);
+audio.addEventListener('error',()=>{const e=audio.error;const codes={1:'aborted',2:'network',3:'decode',4:'src not supported / 404'};showErr(audio.currentSrc||audio.src,codes[e&&e.code]||'unknown');});
+function showErr(src,why){const n=document.getElementById('npTrack');n.classList.add('err');n.textContent='⚠ cannot play — '+why;document.getElementById('npAlbum').textContent=src;console.error('[player]',why,src);np.classList.remove('playing');}
+function fmt(s){if(isNaN(s))return'0:00';return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');}
+
+document.getElementById('playBtn').addEventListener('click',togglePlay);
+document.getElementById('prevBtn').addEventListener('click',prev);
+document.getElementById('nextBtn').addEventListener('click',next);
+document.getElementById('stopBtn').addEventListener('click',stop);
+const vol=document.getElementById('vol');
+vol.addEventListener('input',e=>{audio.volume=e.target.value/100;document.getElementById('volV').textContent=e.target.value;});
+audio.volume=.7;
+
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('ee2').classList.contains('on'))return;
+  if(e.key===' '){e.preventDefault();togglePlay();}
+  else if(e.key==='ArrowRight'&&!e.shiftKey){next();}
+  else if(e.key==='ArrowLeft'){prev();}
+  else if(e.key==='ArrowUp'){e.preventDefault();vol.value=Math.min(100,+vol.value+5);vol.dispatchEvent(new Event('input'));}
+  else if(e.key==='ArrowDown'){e.preventDefault();vol.value=Math.max(0,+vol.value-5);vol.dispatchEvent(new Event('input'));}
+});
+
+// secret track unlock — type "osmosis"
+(function(){let buf='',unlocked=false;
+  document.addEventListener('keydown',e=>{
+    if(unlocked||e.ctrlKey||e.metaKey||e.altKey||e.key.length!==1)return;
+    buf=(buf+e.key.toLowerCase()).slice(-7);
+    if(buf==='osmosis'){unlocked=true;
+      albums.push({title:'[?] hidden transmission',tracks:[
+        {name:'onliest',file:'music/bonus/onliest.mp3'},
+        {name:'the sky above the port',file:'music/bonus/the-sky-above-the-port.mp3'}]});
+      render();
+      const t=document.getElementById('toast');t.classList.add('on');setTimeout(()=>t.classList.remove('on'),5000);
+    }
+  });
+})();
+
+render();
+</script>
+</body>
+</html>

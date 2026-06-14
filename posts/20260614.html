@@ -1,0 +1,40 @@
+<p>quick announcement — i just launched <a href="https://fretboardcodex.com" target="_blank" rel="noopener">fretboardcodex.com</a>, a theory-driven fretboard reference i've been building on the side. pick a tonic and a scale, and the whole page rewires itself: the notes, the diatonic chords, the borrowed chords from parallel modes, the voicings, the circle of fifths, and a practice routine tailored to the key. one global key center, everything else follows.</p>
+
+<p>this post is part announcement, part field guide for anyone who clicks through wondering what they're looking at.</p>
+
+<h2>who it's for</h2>
+<p>guitarists who already know a few shapes but feel stuck on the fretboard — the kind of player who can rip a pentatonic box but can't tell you what degree they're landing on, or why the chord under it works. it's also for anyone moving past chord-charts-and-tabs and wanting to understand the instrument as a system. not a method, not a course. a reference you keep open in a tab while you practice.</p>
+
+<h2>fundamentals of the design</h2>
+<p>i wanted something that loaded fast, worked on a phone next to the amp, and didn't ask me to make an account. so: static html, no backend, no tracking, no ads, no popups. installs as a PWA on ios and android if you want it offline. it remembers your key, scale, fret count, palette, and panel order in localStorage — and nothing leaves the browser.</p>
+
+<p>a few choices that shaped the whole thing:</p>
+
+<p><strong>one global key center.</strong> the top of the page picks a tonic and a scale. every panel below reads from that — the note grid, the diatonic chords with roman numerals and function (tonic / pre-dominant / dominant), the modal-interchange tabs grouped by source mode, the circle of fifths with the current key lit, and a generated practice routine that interpolates the key into every prompt. change the key once; the whole page updates.</p>
+
+<p><strong>theory you can trust.</strong> all the note math runs through <a href="https://github.com/tonaljs/tonal" target="_blank" rel="noopener">tonal.js</a> rather than hand-rolled lookups, so the spelling is correct in every key (f♯ major shows e♯, not f) and the roman numerals follow whatever family you're in — major, minor, or one of the modes. seventh-chord toggle, parallel/relative-key swap with one click.</p>
+
+<p><strong>intervals as the default language.</strong> notes are useful but intervals are what your hands actually learn. roots are filled squares, 3rds and 5ths and 7ths are filled circles, other scale tones are open circles. shape and label always carry the meaning — color is redundant. there's a monochrome toggle for printing or for colorblind-safe viewing.</p>
+
+<p><strong>CAGED as a window, not a wall chart.</strong> instead of five static diagrams, the CAGED row reframes the live fretboard around the chosen shape — the I-chord tones are colored, the rest of the scale stays outlined behind them. switch shapes and the window slides up the neck.</p>
+
+<p><strong>voicings, not just shapes.</strong> focus any diatonic chord and a voicings panel opens above the fretboard: triads, 7ths, and extensions (9ths, 11ths, 13ths) you can toggle in and out and see overlaid on the neck.</p>
+
+<p><strong>quiet visuals, slightly broken.</strong> i didn't want it to look like a textbook. the whole UI has a subtle grain and a tiny SVG wobble — the kind of worn-tech feel i keep coming back to in <a href="index.html">after osmosis</a>. six palettes (rebel, console, verdigris, rust, phosphor, hazard), each tuned for day and night. switch any time from the floating palette button.</p>
+
+<p><strong>12 / 15 / 22 frets, lefty mirror, drag-to-reorder panels.</strong> the small ergonomic things mattered more than i expected. the lower three panels — modal interchange, circle of fifths, practice — can be reordered by dragging; the order persists.</p>
+
+<h2>how to use it</h2>
+<p>three ways i actually use it day to day:</p>
+
+<p><strong>as a practice companion.</strong> pick a key, generate a routine in the practice panel. each prompt has a hint and a jump-to button that scrolls to the relevant panel (the harmony, the fretboard, the interchange tabs) — so when it says "ii–V–I 7th-chord voicings in F," you tap through and the voicings are already laid out on the neck.</p>
+
+<p><strong>as a writing tool.</strong> when i'm sketching a part and want a chord that isn't quite diatonic, i flip to the interchange panel and see what parallel dorian, phrygian, mixolydian, or harmonic minor would lend me. click the chord, it focuses on the fretboard with closed-voicing options.</p>
+
+<p><strong>as a key map.</strong> the key card shows notes, degrees, intervals, family, parallel and relative. the circle of fifths shows where you are and what's one move away. when a song modulates and i can't tell what i'm hearing, this is usually how i find it.</p>
+
+<h2>what's next</h2>
+<p>v1 covers the foundation — tonic + scale, diatonic harmony, voicings, CAGED windows, modal interchange, circle of fifths, and the practice generator. on the list: audio (none in v1 — every chord and voicing is silent on purpose for now), arpeggio overlays, a chord-progression scratchpad that highlights shared tones between voicings, and an ear-training mode that hides the diagram. no roadmap, no promises — i'll add things as i need them and write here when something useful ships.</p>
+
+<h2>go look</h2>
+<p>it's at <a href="https://fretboardcodex.com" target="_blank" rel="noopener">fretboardcodex.com</a>. free, no signup, works on a phone, installs offline. if you find a bug or want a feature, the links at the bottom of this page still work — drop me a line.</p>
