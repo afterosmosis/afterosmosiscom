@@ -13,35 +13,73 @@
   .home-main{
     position:relative;z-index:5;min-height:100vh;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
-    padding:84px 20px 28px;
+    padding:64px 20px 24px;
   }
   .intro{text-align:center;margin-bottom:2px}
   .intro .lead{font-size:12px;letter-spacing:.16em;color:var(--ink-dim);text-transform:uppercase}
-  .stage{width:min(620px,80vmin);margin:0 auto}
+  .stage{width:min(820px,94vmin);margin:0 auto}
   .tnum-short{display:none}
   .sig-svg{display:block;width:100%;height:auto;overflow:visible}
   .tagline{
     text-align:center;margin-top:2px;font-size:13px;letter-spacing:.22em;color:var(--ink-dim);
   }
   .tagline b{color:var(--line);font-weight:400}
-  .hint{margin-top:14px;text-align:center;font-size:11px;letter-spacing:.16em;color:var(--ink-faint)}
-  .hint .k{color:var(--accent)}
 
-  /* sigil motion — the rings use SMIL animateTransform in markup (Firefox bug
-     1610093 makes `transform-box: fill-box` zero-size on fill="none" elements,
-     killing CSS rotations). These rules only handle the intro + hover dial swing. */
-  .par{transform-box:fill-box;transform-origin:center}
-  /* dial: the whole ring stack turns toward a hovered node, then eases back */
-  #dial{transform-box:fill-box;transform-origin:center;transition:transform 1.15s cubic-bezier(.16,1,.3,1)}
-  .sigil{transform-box:fill-box;transform-origin:center;animation:siglin 1.4s cubic-bezier(.2,.7,.2,1) both}
-  @keyframes siglin{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
-  /* sweep: passive spin + smooth aim-at-node are both driven from JS rAF,
-     so this rule only styles the static appearance. */
+  /* progressive-disclosure readout — resolves node context in the negative space */
+  .readout{margin-top:14px;text-align:center;min-height:34px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:3px}
+  .readout .r-main{font-size:11px;letter-spacing:.16em;color:var(--ink-faint);transition:color .25s}
+  .readout .r-main .k{color:var(--accent)}
+  .readout.armed .r-main{color:var(--line)}
+  .readout .r-sub{font-size:10px;letter-spacing:.1em;color:var(--accent-2);height:12px;
+    opacity:0;transform:translateY(-3px);transition:opacity .25s,transform .25s}
+  .readout.armed .r-sub{opacity:1;transform:none}
+
+  /* sigil — dense concentric blackwork stack; four labelled dials carry real state */
+  .sig-svg{--stroke:var(--line)}
+  /* ambient stack fades back when a dial is armed */
+  .ambi-stack{transition:opacity .4s}
+  .sig-svg.aiming .ambi-stack{opacity:.1}
+  .dring{transition:opacity .35s}
+  .sig-svg.aiming .dring{opacity:.12}
+  .sig-svg.aiming .dring.hot{opacity:1}
+  /* the crisp labelled dial ring */
+  .dring .base{stroke:var(--line-2);transition:stroke .3s}
+  .dring.hot .base{stroke:var(--line)}
+  /* faint capacity track + graduations behind each reading */
+  .dring .grad{stroke:var(--line-dim);stroke-width:1;transition:stroke .25s}
+  .dring.hot .grad{stroke:var(--accent-2)}
+  /* the bold reading itself */
+  .dring .datamark{stroke:var(--line);fill:var(--line);transition:stroke .25s,fill .25s}
+  .dring .spoke{stroke:var(--line-2);stroke-width:2.5;transition:stroke .25s}
+  .dring.hot .spoke{stroke:var(--accent)}
+  .dring .solder{fill:var(--line-2);stroke:none;transition:fill .25s}
+  .dring.hot .solder{fill:var(--accent)}
+  .dring.hot .datamark{stroke:var(--accent);fill:var(--accent)}
+  /* archived gear reads as structure, not signal */
+  .dring .dim-mark{stroke:var(--line-dim);fill:var(--line-dim)}
+  .dring.hot .dim-mark{stroke:var(--accent-2);fill:var(--accent-2)}
+  /* music is the live node — cyan at rest with a breathing halo */
+  .dring.live .base{stroke:var(--accent-2)}
+  .dring.live .datamark{stroke:var(--accent-2);fill:var(--accent-2)}
+  .dring.live.hot .datamark{stroke:var(--accent);fill:var(--accent)}
+  .dring.live .live-halo{stroke:var(--accent);fill:none;animation:ringpulse 2.6s ease-in-out infinite}
+  @keyframes ringpulse{0%,100%{opacity:.1}50%{opacity:.5}}
   .sweep{opacity:.5}
-  .aiming .sweep{opacity:.95;stroke-width:2.6}
-  .aiming #dial{filter:drop-shadow(0 0 5px var(--accent-glow))}
-  /* music-terminal pulsing ring uses SMIL <animate> for the same reason as the dial rings. */
-  .mring{transform-box:fill-box;transform-origin:center}
+  .sig-svg.aiming .sweep{opacity:.95;stroke-width:2.6}
+
+  /* ---- mechanical rings: teeth, graduations, bearings drawn onto the full rings ---- */
+  .dring .base{stroke:var(--line-2);fill:none;transition:stroke .3s}
+  .dring.hot .base{stroke:var(--accent)}
+  .dring .datamark{fill:var(--line);stroke:var(--line);transition:fill .25s,stroke .25s}
+  .dring.hot .datamark{fill:var(--accent);stroke:var(--accent)}
+  .dring .grad{stroke:var(--line-dim);fill:none;transition:stroke .25s}
+  .dring.hot .grad{stroke:var(--accent-2)}
+  /* music is the live ring — accent at rest */
+  .dring.live .base{stroke:var(--accent-2)}
+  .dring.live .datamark{fill:var(--accent-2);stroke:var(--accent-2)}
+  .dring.live.hot .base{stroke:var(--accent)}
+  .dring.live.hot .datamark{fill:var(--accent);stroke:var(--accent)}
 
   /* terminals */
   .term{cursor:pointer}
@@ -49,18 +87,12 @@
   .term .tnode{fill:var(--line);transition:fill .2s}
   .term .thole{fill:var(--bg)}
   .term .tring{fill:none;stroke:var(--accent);stroke-width:1.5;opacity:0;transition:opacity .2s;stroke-dasharray:3 4}
-  .term .tstub{stroke:var(--line);stroke-width:3;transition:stroke .2s}
   .term .tlabel{fill:var(--line);font-size:17px;font-weight:700;letter-spacing:.14em;transition:fill .2s}
   .term .tnum{fill:var(--ink-faint);font-size:10px;letter-spacing:.1em}
-  .term .tdot{fill:var(--line);transition:fill .2s}
   .term:hover .tnode,.term:focus-visible .tnode{fill:var(--accent)}
   .term:hover .tlabel,.term:focus-visible .tlabel{fill:var(--accent)}
-  .term:hover .tstub,.term:focus-visible .tstub{stroke:var(--accent)}
-  .term:hover .tdot{fill:var(--accent)}
   .term:hover .tring,.term:focus-visible .tring{opacity:1}
   .term.lit .tnode{fill:var(--accent)}
-  .term.lit .tlabel{fill:var(--line)}
-  .term.lit .tstub{stroke:var(--accent)}
   .term:focus{outline:none}
 
   /* links overlay */
@@ -83,16 +115,15 @@
   @media (max-width:640px){
     .home-main{padding:58px 6px 18px;justify-content:flex-start;gap:6px}
     .intro .lead{font-size:10px;letter-spacing:.12em}
-    .stage{width:min(620px,98vmin)}
+    .stage{width:min(700px,98vmin)}
     .term .tlabel{font-size:24px;letter-spacing:.08em}
     .term .tnum{font-size:12px;letter-spacing:.08em}
-    /* push sublabels clear of the bigger title text */
     .tnum-top{transform:translateY(-10px);transform-box:fill-box;transform-origin:center}
     .tnum-bot{transform:translateY(12px);transform-box:fill-box;transform-origin:center}
     .tnum-full{display:none}
     .tnum-short{display:inline}
     .tagline{font-size:10px;letter-spacing:.1em;margin-top:4px;padding:0 12px}
-    .hint{font-size:10px;letter-spacing:.12em;margin-top:8px;padding:0 12px}
+    .readout{margin-top:8px;padding:0 12px}
   }
 </style>
 </head>
@@ -110,125 +141,57 @@
 
     <div class="stage">
       <svg class="sig-svg" viewBox="0 0 800 800" role="img" aria-label="after osmosis — navigation sigil">
-        <g class="par" id="par">
-        <g class="sigil">
-          <!-- axes behind core -->
-          <g stroke="var(--line)" stroke-width="2" opacity=".55">
-            <line x1="393" y1="118" x2="393" y2="602"/>
-            <line x1="407" y1="118" x2="407" y2="602"/>
-            <line x1="160" y1="360" x2="640" y2="360"/>
-          </g>
+        <!-- concentric blackwork stack + four data dials, built by JS so each dial encodes real state -->
+        <g id="rings"></g>
 
-          <!-- diagonal spokes -->
-          <g stroke="var(--line)" stroke-width="3">
-            <line x1="461" y1="299" x2="612" y2="148"/>
-            <line x1="339" y1="299" x2="188" y2="148"/>
-            <line x1="461" y1="421" x2="612" y2="572"/>
-            <line x1="339" y1="421" x2="188" y2="572"/>
-          </g>
+        <!-- core -->
+        <circle cx="400" cy="360" r="50" fill="var(--bg)" stroke="var(--line)" stroke-width="3"/>
+        <circle cx="400" cy="360" r="36" fill="none" stroke="var(--line-dim)" stroke-width="1.5"/>
+        <text x="400" y="356" text-anchor="middle" font-family="var(--mono)" font-size="22" font-weight="700" fill="var(--line)">∴ AO</text>
+        <text x="400" y="378" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--ink-dim)" letter-spacing="2">core</text>
 
-          <!-- DIAL: rings + sweep + band dots, turns toward a hovered node -->
-          <g id="dial">
-          <!-- rings (irregular spacing / gaps / sizes · mixed direction + speed).
-               Animated with SMIL <animateTransform> rather than CSS keyframes because
-               Firefox bug 1610093 makes `transform-box: fill-box` return a zero-size
-               box for SVG elements with fill="none" (all our rings), which kills the
-               CSS rotation pivot. SMIL `rotate(angle cx cy)` carries its own pivot. -->
-          <circle cx="400" cy="360" r="300" fill="none" stroke="var(--line)" stroke-width="9" stroke-dasharray="184 26 58 46 112 28 74 20"><animateTransform attributeName="transform" type="rotate" from="0 400 360" to="360 400 360" dur="220s" repeatCount="indefinite"/></circle>
-          <circle cx="400" cy="360" r="270" fill="none" stroke="var(--line-2)" stroke-width="11" stroke-dasharray="2 19"><animateTransform attributeName="transform" type="rotate" from="360 400 360" to="0 400 360" dur="95s" repeatCount="indefinite"/></circle>
-          <circle cx="400" cy="360" r="236" fill="none" stroke="var(--line)" stroke-width="25" stroke-dasharray="124 82 36 58 96 30"><animateTransform attributeName="transform" type="rotate" from="0 400 360" to="360 400 360" dur="140s" repeatCount="indefinite"/></circle>
-          <circle cx="400" cy="360" r="210" fill="none" stroke="var(--line-dim)" stroke-width="2" stroke-dasharray="60 28 140 40"><animateTransform attributeName="transform" type="rotate" from="360 400 360" to="0 400 360" dur="310s" repeatCount="indefinite"/></circle>
-          <circle cx="400" cy="360" r="176" fill="none" stroke="var(--line)" stroke-width="13" stroke-dasharray="86 44 24 18 62 36"><animateTransform attributeName="transform" type="rotate" from="360 400 360" to="0 400 360" dur="70s" repeatCount="indefinite"/></circle>
-          <circle cx="400" cy="360" r="150" fill="none" stroke="var(--line-2)" stroke-width="7" stroke-dasharray="40 58 16 30 70 22"><animateTransform attributeName="transform" type="rotate" from="0 400 360" to="360 400 360" dur="52s" repeatCount="indefinite"/></circle>
-          <circle cx="400" cy="360" r="116" fill="none" stroke="var(--line-dim)" stroke-width="2"/>
-          <circle cx="400" cy="360" r="92" fill="none" stroke="var(--line)" stroke-width="10" stroke-dasharray="64 22 30 14 20 24"><animateTransform attributeName="transform" type="rotate" from="360 400 360" to="0 400 360" dur="38s" repeatCount="indefinite"/></circle>
-          <circle cx="400" cy="360" r="64" fill="none" stroke="var(--line)" stroke-width="6" stroke-dasharray="34 20 12 10 22 8"><animateTransform attributeName="transform" type="rotate" from="0 400 360" to="360 400 360" dur="28s" repeatCount="indefinite"/></circle>
-
-          <!-- radar sweep — driven by JS rAF (see bottom of file) so we can smoothly
-               interrupt the passive spin to "aim" at a hovered node. -->
-          <line class="sweep" id="sweep" x1="400" y1="360" x2="400" y2="64" stroke="var(--accent)" stroke-width="2"/>
-
-          <!-- band node dots -->
-          <g fill="var(--line)">
-            <circle cx="490" cy="450" r="6"/><circle cx="310" cy="450" r="6"/>
-            <circle cx="490" cy="270" r="6"/><circle cx="310" cy="270" r="6"/>
-            <circle cx="400" cy="232" r="5"/><circle cx="400" cy="488" r="5"/>
-            <circle cx="528" cy="360" r="5"/><circle cx="272" cy="360" r="5"/>
-          </g>
-          <g fill="var(--accent)"><circle cx="528" cy="360" r="3.5"/><circle cx="400" cy="232" r="3.5"/></g>
-          </g>
-          <!-- /DIAL -->
-
-          <!-- core -->
-          <circle cx="400" cy="360" r="50" fill="var(--bg)" stroke="var(--line)" stroke-width="3"/>
-          <circle cx="400" cy="360" r="36" fill="none" stroke="var(--line-dim)" stroke-width="1.5"/>
-          <text x="400" y="356" text-anchor="middle" font-family="var(--mono)" font-size="22" font-weight="700" fill="var(--line)">∴ AO</text>
-          <text x="400" y="378" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--ink-dim)" letter-spacing="2">core</text>
-
-          <!-- descending spine — sits below the outer ring so it no longer cuts through the dial -->
-          <g stroke="var(--line)" stroke-width="4" fill="none">
-            <line x1="395" y1="664" x2="395" y2="722"/><line x1="405" y1="664" x2="405" y2="722"/>
-          </g>
-          <line x1="376" y1="682" x2="424" y2="682" stroke="var(--line)" stroke-width="2"/>
-          <polygon points="400,714 414,723 414,743 400,752 386,743 386,723" fill="var(--line)"/>
-          <polygon points="400,721 408,726 408,740 400,745 392,740 392,726" fill="var(--bg)"/>
-          <line x1="400" y1="752" x2="400" y2="778" stroke="var(--line)" stroke-width="3"/>
-          <circle cx="400" cy="784" r="4" fill="var(--accent)"/>
-
-          <!-- flanking hex cells — shifted outward to clear the outer ring -->
-          <g stroke="var(--line-2)" stroke-width="1.5" fill="none">
-            <polygon points="62,360 76,351 90,360 90,378 76,387 62,378"/>
-            <polygon points="710,360 724,351 738,360 738,378 724,387 710,378"/>
-          </g>
-
-          <!-- terminal solder dots -->
-          <g fill="var(--line)"><circle cx="612" cy="148" r="8"/><circle cx="188" cy="148" r="8"/><circle cx="612" cy="572" r="8"/><circle cx="188" cy="572" r="8"/></g>
-
-          <!-- TERMINALS -->
-          <a class="term" href="blog.html" aria-label="blog">
-            <line class="tstub" x1="188" y1="148" x2="160" y2="116"/>
-            <circle class="tring" cx="160" cy="116" r="20"/>
-            <circle class="tnode" cx="160" cy="116" r="13"/>
-            <circle class="thole" cx="160" cy="116" r="4"/>
-            <text class="tlabel" x="160" y="76" text-anchor="middle" font-family="var(--mono)">blog</text>
-            <text class="tnum tnum-top" x="160" y="58" text-anchor="middle" font-family="var(--mono)">n01</text>
-            <circle class="hot" cx="160" cy="116" r="44"/>
-          </a>
-          <a class="term lit" href="player.html" aria-label="music">
-            <line class="tstub" x1="612" y1="148" x2="640" y2="116"/>
-            <circle class="mring tring" cx="640" cy="116" r="22" style="opacity:1"><animate attributeName="r" values="22;23.32;22" dur="2.6s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1" keyTimes="0;0.5;1"/><animate attributeName="opacity" values="0.55;1;0.55" dur="2.6s" repeatCount="indefinite" keyTimes="0;0.5;1"/></circle>
-            <circle class="tnode" cx="640" cy="116" r="14"/>
-            <circle class="thole" cx="640" cy="116" r="5" style="fill:var(--bg)"/>
-            <text class="tlabel" x="640" y="76" text-anchor="middle" font-family="var(--mono)">music</text>
-            <text class="tnum tnum-top tnum-full" x="640" y="58" text-anchor="middle" font-family="var(--mono)">n02 · 03 albums</text>
-            <text class="tnum tnum-top tnum-short" x="640" y="58" text-anchor="middle" font-family="var(--mono)">n02</text>
-            <circle class="hot" cx="640" cy="116" r="46"/>
-          </a>
-          <a class="term" href="gear.html" aria-label="gear">
-            <line class="tstub" x1="188" y1="572" x2="160" y2="604"/>
-            <circle class="tring" cx="160" cy="604" r="20"/>
-            <circle class="tnode" cx="160" cy="604" r="13"/>
-            <circle class="thole" cx="160" cy="604" r="4"/>
-            <text class="tlabel" x="160" y="648" text-anchor="middle" font-family="var(--mono)">gear</text>
-            <text class="tnum tnum-bot" x="160" y="666" text-anchor="middle" font-family="var(--mono)">n03</text>
-            <circle class="hot" cx="160" cy="604" r="44"/>
-          </a>
-          <a class="term" id="termLinks" href="#links" aria-label="links">
-            <line class="tstub" x1="612" y1="572" x2="640" y2="604"/>
-            <circle class="tring" cx="640" cy="604" r="20"/>
-            <circle class="tnode" cx="640" cy="604" r="13"/>
-            <circle class="thole" cx="640" cy="604" r="4"/>
-            <text class="tlabel" x="640" y="648" text-anchor="middle" font-family="var(--mono)">links</text>
-            <text class="tnum tnum-bot" x="640" y="666" text-anchor="middle" font-family="var(--mono)">n04</text>
-            <circle class="hot" cx="640" cy="604" r="44"/>
-          </a>
-        </g>
-        </g>
+        <!-- TERMINALS -->
+        <a class="term" href="blog.html" aria-label="blog">
+          <circle class="tring" cx="160" cy="116" r="20"/>
+          <circle class="tnode" cx="160" cy="116" r="13"/>
+          <circle class="thole" cx="160" cy="116" r="4"/>
+          <text class="tlabel" x="160" y="76" text-anchor="middle" font-family="var(--mono)">blog</text>
+          <text class="tnum tnum-top" x="160" y="58" text-anchor="middle" font-family="var(--mono)">n01</text>
+          <circle class="hot" cx="160" cy="116" r="46"/>
+        </a>
+        <a class="term lit" href="player.html" aria-label="music">
+          <circle class="mring tring" cx="640" cy="116" r="22" style="opacity:1"><animate attributeName="r" values="22;23.32;22" dur="2.6s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1" keyTimes="0;0.5;1"/><animate attributeName="opacity" values="0.55;1;0.55" dur="2.6s" repeatCount="indefinite" keyTimes="0;0.5;1"/></circle>
+          <circle class="tnode" cx="640" cy="116" r="14"/>
+          <circle class="thole" cx="640" cy="116" r="5" style="fill:var(--bg)"/>
+          <text class="tlabel" x="640" y="76" text-anchor="middle" font-family="var(--mono)">music</text>
+          <text class="tnum tnum-top tnum-full" x="640" y="58" text-anchor="middle" font-family="var(--mono)">n02 · 03 albums</text>
+          <text class="tnum tnum-top tnum-short" x="640" y="58" text-anchor="middle" font-family="var(--mono)">n02</text>
+          <circle class="hot" cx="640" cy="116" r="48"/>
+        </a>
+        <a class="term" href="gear.html" aria-label="gear">
+          <circle class="tring" cx="160" cy="604" r="20"/>
+          <circle class="tnode" cx="160" cy="604" r="13"/>
+          <circle class="thole" cx="160" cy="604" r="4"/>
+          <text class="tlabel" x="160" y="648" text-anchor="middle" font-family="var(--mono)">gear</text>
+          <text class="tnum tnum-bot" x="160" y="666" text-anchor="middle" font-family="var(--mono)">n03</text>
+          <circle class="hot" cx="160" cy="604" r="46"/>
+        </a>
+        <a class="term" id="termLinks" href="#links" aria-label="links">
+          <circle class="tring" cx="640" cy="604" r="20"/>
+          <circle class="tnode" cx="640" cy="604" r="13"/>
+          <circle class="thole" cx="640" cy="604" r="4"/>
+          <text class="tlabel" x="640" y="648" text-anchor="middle" font-family="var(--mono)">links</text>
+          <text class="tnum tnum-bot" x="640" y="666" text-anchor="middle" font-family="var(--mono)">n04</text>
+          <circle class="hot" cx="640" cy="604" r="46"/>
+        </a>
       </svg>
     </div>
 
     <div class="tagline">postrock <b>·</b> ambient <b>·</b> lofi <b>·</b> texture</div>
-    <div class="hint">select a <span class="k">terminal</span> to enter</div>
+    <div class="readout" id="readout">
+      <div class="r-main">select a <span class="k">terminal</span> to enter</div>
+      <div class="r-sub"></div>
+    </div>
   </main>
 
   <!-- links overlay -->
@@ -255,64 +218,151 @@
 
 <script src="eggs.js"></script>
 <script>
+(function(){
+  const NS='http://www.w3.org/2000/svg';
+  const CX=400, CY=360;
+  // angle: degrees clockwise from north (12 o'clock). matches sweep + node diagonals.
+  function P(r,a){const t=a*Math.PI/180;return [CX + r*Math.sin(t), CY - r*Math.cos(t)];}
+  function arc(r,a0,a1){const [x0,y0]=P(r,a0),[x1,y1]=P(r,a1);const large=Math.abs(a1-a0)>180?1:0;
+    return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 ${large} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;}
+  function E(name,attrs){const e=document.createElementNS(NS,name);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+
+  const TNODE={blog:[160,116],music:[640,116],gear:[160,604],links:[640,604]};
+  // each ring: radius, node-facing angle (diagonal toward its terminal)
+  const RINGS={
+    blog:{r:296,ang:315},
+    music:{r:240,ang:45},
+    gear:{r:184,ang:225},
+    links:{r:128,ang:135}
+  };
+
+  // real state (music/gear/links from the pages; blog fetched from posts/index.json)
+  const DATA={
+    blog:{n:2,latest:'launching fretboardcodex.com'},
+    music:{albums:3,tracks:16,sizes:[4,8,4]},
+    gear:{live:2,archive:3},
+    links:{names:['bandcamp','instagram','fretboardcodex']}
+  };
+
+  const root=document.getElementById('rings');
+  const svg=document.querySelector('.sig-svg');
+
+  const ringEls={};
+
+  // ---- two quiet framing rings; the mechanisms carry the rest, with air between ----
+  function ambiRing(parent,o){
+    const c=E('circle',{cx:CX,cy:CY,r:o.r,fill:'none',stroke:o.stroke,'stroke-width':o.w,'stroke-dasharray':o.dash||'1 0'});
+    if(o.dur){const f=(o.dir<0?360:0)+' '+CX+' '+CY,t=(o.dir<0?0:360)+' '+CX+' '+CY;
+      c.appendChild(E('animateTransform',{attributeName:'transform',type:'rotate',from:f,to:t,dur:o.dur+'s',repeatCount:'indefinite'}));}
+    parent.appendChild(c);
+  }
+  const ambi=E('g',{class:'ambi-stack'});root.appendChild(ambi);
+  [
+    {r:316,w:1, dash:'2 18',dur:260,dir:1, stroke:'var(--line-dim)'},
+    {r:86, w:2, dash:'2 9', dur:46, dir:-1,stroke:'var(--line-dim)'}
+  ].forEach(o=>ambiRing(ambi,o));
+
+  // ---- each section IS a full concentric ring, styled as a mechanism ----
+  function pol(cx,cy,r,a){return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}
+  function group(key,extra){const g=E('g',{class:'dring'+(extra?' '+extra:''),'data-node':key});root.appendChild(g);ringEls[key]=g;return g;}
+  function lead(g,key){const {r,ang}=RINGS[key],s=P(r,ang),[x1,y1]=TNODE[key];
+    g.appendChild(E('line',{class:'spoke',x1:s[0].toFixed(2),y1:s[1].toFixed(2),x2:x1,y2:y1}));
+    g.appendChild(E('circle',{class:'solder',cx:s[0].toFixed(2),cy:s[1].toFixed(2),r:4}));}
+  // returns the rotating inner group; spoke + solder stay fixed on the outer group
+  function section(key,extra){const g=group(key,extra);lead(g,key);const s=E('g',{});g.appendChild(s);return s;}
+  function rotate(s,dur,dir){const f=(dir<0?360:0)+' '+CX+' '+CY,t=(dir<0?0:360)+' '+CX+' '+CY;
+    s.appendChild(E('animateTransform',{attributeName:'transform',type:'rotate',from:f,to:t,dur:dur+'s',repeatCount:'indefinite'}));}
+  function ringBase(s,r,w){s.appendChild(E('circle',{class:'base',cx:CX,cy:CY,r,fill:'none','stroke-width':w}));}
+  // gear teeth around the whole rim
+  function teethRing(s,r,teeth,h,wfrac){const st=2*Math.PI/teeth;
+    for(let i=0;i<teeth;i++){const c=i*st-Math.PI/2,
+      p1=pol(CX,CY,r,c-st*wfrac),p2=pol(CX,CY,r+h,c-st*wfrac*0.6),p3=pol(CX,CY,r+h,c+st*wfrac*0.6),p4=pol(CX,CY,r,c+st*wfrac);
+      s.appendChild(E('path',{class:'datamark',stroke:'none',d:'M'+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+'L'+p2[0].toFixed(2)+' '+p2[1].toFixed(2)+'L'+p3[0].toFixed(2)+' '+p3[1].toFixed(2)+'L'+p4[0].toFixed(2)+' '+p4[1].toFixed(2)+'Z'}));}}
+  // graduation ticks around the whole rim (majors every `every`)
+  function tickRing(s,r,n,len,every,majLen){
+    for(let i=0;i<n;i++){const a=i/n*2*Math.PI-Math.PI/2,maj=(i%every===0),p1=pol(CX,CY,r,a),p2=pol(CX,CY,r+(maj?majLen:len),a);
+      s.appendChild(E('line',{class:maj?'datamark':'grad',x1:p1[0].toFixed(2),y1:p1[1].toFixed(2),x2:p2[0].toFixed(2),y2:p2[1].toFixed(2),'stroke-width':maj?2.4:1}));}}
+
+  // n01 blog — index / chapter ring: fine graduations, a longer index tick per entry
+  (function(){const s=section('blog');ringBase(s,296,1.4);
+    const n=Math.max(DATA.blog.n,1);tickRing(s,296,60,6,Math.max(2,Math.round(60/n)),13);rotate(s,340,1);})();
+
+  // n02 music — the driving gear, fine teeth; live / accent
+  (function(){const s=section('music','live');ringBase(s,240,2);teethRing(s,240,72,9,0.34);rotate(s,150,-1);})();
+
+  // n03 gear — a coarse gear wheel, big teeth
+  (function(){const s=section('gear');ringBase(s,184,2.4);teethRing(s,184,22,17,0.42);rotate(s,112,1);})();
+
+  // n04 links — perforated bearing band: one lit bearing per external destination
+  (function(){const s=section('links');ringBase(s,130,1.6);ringBase(s,118,1);
+    const holes=12;for(let i=0;i<holes;i++){const a=i/holes*2*Math.PI-Math.PI/2,p=pol(CX,CY,124,a);
+      s.appendChild(E('circle',{class:'grad',cx:p[0].toFixed(2),cy:p[1].toFixed(2),r:2.3,fill:'none','stroke-width':1}));}
+    const n=DATA.links.names.length;for(let i=0;i<n;i++){const a=i/n*2*Math.PI-Math.PI/2,p=pol(CX,CY,124,a);
+      s.appendChild(E('circle',{class:'datamark',stroke:'none',cx:p[0].toFixed(2),cy:p[1].toFixed(2),r:4}));}
+    rotate(s,210,-1);})();
+
+  // radar sweep — rAF-driven so passive spin smoothly hands off to aim-at-node
+  const sweep=E('line',{class:'sweep',id:'sweep',x1:CX,y1:CY,x2:CX,y2:64,stroke:'var(--accent)','stroke-width':2});
+  root.appendChild(sweep);
+
+  const AIM={blog:-44,music:44,gear:-135,links:135};
+  let sweepAngle=0,aimTarget=null,lastT=performance.now();const SPIN_MS=16000;
+  function tick(t){
+    const dt=Math.min(t-lastT,64);lastT=t;
+    if(aimTarget!==null){let diff=aimTarget-sweepAngle;while(diff>180)diff-=360;while(diff<-180)diff+=360;sweepAngle+=diff*Math.min(1,dt/220);}
+    else{sweepAngle+=dt*(360/SPIN_MS);}
+    if(sweepAngle>720||sweepAngle<-720)sweepAngle=((sweepAngle%360)+360)%360;
+    sweep.setAttribute('transform','rotate('+sweepAngle.toFixed(3)+' '+CX+' '+CY+')');
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(function(t){lastT=t;tick(t);});
+
+  // readout copy per node — progressive disclosure into the negative space
+  const readout=document.getElementById('readout');
+  const rMain=readout.querySelector('.r-main'), rSub=readout.querySelector('.r-sub');
+  function line(key){
+    const d=DATA;
+    if(key==='blog')return ['n01 · log',d.blog.n+' entries · latest: '+d.blog.latest];
+    if(key==='music')return ['n02 · library',d.music.albums+' albums · '+d.music.tracks+' tracks'];
+    if(key==='gear')return ['n03 · rig',d.gear.live+' in use · '+d.gear.archive+' archived'];
+    if(key==='links')return ['n04 · external',d.links.names.join(' · ')];
+    return ['',''];
+  }
+  const DEFAULT='select a <span class="k">terminal</span> to enter';
+
+  function arm(key){
+    svg.classList.add('aiming');
+    Object.keys(ringEls).forEach(k=>ringEls[k].classList.toggle('hot',k===key));
+    aimTarget=AIM[key];
+    const [m,s]=line(key);rMain.textContent=m;rSub.textContent=s;readout.classList.add('armed');
+  }
+  function disarm(){
+    svg.classList.remove('aiming');
+    Object.keys(ringEls).forEach(k=>ringEls[k].classList.remove('hot'));
+    aimTarget=null;
+    rMain.innerHTML=DEFAULT;rSub.textContent='';readout.classList.remove('armed');
+  }
+  document.querySelectorAll('.term').forEach(function(t){
+    const key=t.getAttribute('aria-label');
+    t.addEventListener('mouseenter',function(){arm(key);});
+    t.addEventListener('mouseleave',disarm);
+    t.addEventListener('focus',function(){arm(key);});
+    t.addEventListener('blur',disarm);
+  });
+
+  // latest blog title feeds the hover readout when served over http
+  fetch('posts/index.json').then(r=>r.ok?r.json():null).then(list=>{
+    if(!list||!list.length)return;
+    DATA.blog.n=list.length;DATA.blog.latest=list[0].title;
+  }).catch(()=>{});
+
   // links overlay
   var lm=document.getElementById('linkmodal');
   document.getElementById('termLinks').addEventListener('click',function(e){e.preventDefault();lm.classList.add('on');});
   document.getElementById('linkClose').addEventListener('click',function(){lm.classList.remove('on');});
   lm.addEventListener('click',function(e){if(e.target===lm)lm.classList.remove('on');});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')lm.classList.remove('on');});
-
-  // sigil responds to node hover: rings dial toward the node, accent sweep aims at it.
-  // Sweep is driven by rAF (not CSS animation) so we can smoothly interrupt the
-  // passive spin to point at a hovered terminal.
-  var svg=document.querySelector('.sig-svg');
-  var dial=document.getElementById('dial');
-  var sweep=document.getElementById('sweep');
-  // angle (deg, clockwise from north) from core(400,360) to each terminal node
-  var AIM={blog:-44, music:44, gear:-135, links:135};
-  // how far the ring stack turns toward each node (lower nodes turn a touch more)
-  var TURN={blog:-20, music:20, gear:-28, links:28};
-
-  var sweepAngle=0;          // current sweep angle in degrees
-  var aimTarget=null;        // null = passive spin; number = ease toward this angle
-  var lastT=performance.now();
-  var SPIN_MS=16000;         // one passive revolution per 16s (matches the old CSS)
-
-  function tick(t){
-    var dt=Math.min(t-lastT,64); lastT=t;
-    if(aimTarget!==null){
-      // approach target along the shorter arc, easing in
-      var diff=aimTarget-sweepAngle;
-      while(diff>180) diff-=360;
-      while(diff<-180) diff+=360;
-      sweepAngle += diff * Math.min(1, dt/220);
-    } else {
-      sweepAngle += dt * (360/SPIN_MS);
-    }
-    // normalize for cleanliness; doesn't affect rendering
-    if(sweepAngle>720||sweepAngle<-720) sweepAngle = ((sweepAngle%360)+360)%360;
-    sweep.setAttribute('transform','rotate('+sweepAngle.toFixed(3)+' 400 360)');
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(function(t){lastT=t;tick(t);});
-
-  function arm(key){
-    dial.style.transform='rotate('+TURN[key]+'deg)';
-    aimTarget=AIM[key];
-    svg.classList.add('aiming');
-  }
-  function disarm(){
-    dial.style.transform='';
-    aimTarget=null;
-    svg.classList.remove('aiming');
-  }
-  document.querySelectorAll('.term').forEach(function(t){
-    var key=t.getAttribute('aria-label');
-    t.addEventListener('mouseenter',function(){arm(key);});
-    t.addEventListener('mouseleave',disarm);
-    t.addEventListener('focus',function(){arm(key);});
-    t.addEventListener('blur',disarm);
-  });
+})();
 </script>
 </body>
 </html>

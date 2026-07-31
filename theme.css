@@ -5,37 +5,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
 
 :root{
-  --bg:#0b0c0f;
-  --bg-2:#101319;
-  --panel:#0e1014;
-  --line:#e9e5d8;        /* bone — the "ink" of the blackwork */
-  --line-2:#9aa0a8;      /* secondary linework */
-  --line-dim:#3a3f47;    /* faint structure */
-  --ink:#c7cbd2;         /* body text */
-  --ink-dim:#7b8089;     /* muted text */
-  --ink-faint:#565b64;
-  --accent:#5fb3c4;      /* signal cyan */
-  --accent-2:#2f6b76;    /* dim cyan */
-  --accent-glow:rgba(95,179,196,.45);
-  --hair:rgba(233,229,216,.14);
+  /* dark = NEON CIRCUIT — near-black + logo cyan (from fretboardcodex) */
+  --bg:oklch(0.15 0.012 250);
+  --bg-2:oklch(0.19 0.014 250);
+  --panel:oklch(0.23 0.016 250);
+  --line:oklch(0.95 0.020 200);        /* bone linework */
+  --line-2:oklch(0.64 0.020 200);      /* secondary linework */
+  --line-dim:oklch(0.40 0.020 250);    /* faint structure */
+  --ink:oklch(0.82 0.020 200);         /* body text */
+  --ink-dim:oklch(0.64 0.020 200);
+  --ink-faint:oklch(0.46 0.020 200);
+  --accent:oklch(0.85 0.15 195);       /* signal cyan */
+  --accent-2:oklch(0.58 0.12 195);     /* dim cyan */
+  --accent-glow:oklch(0.85 0.15 195 / .42);
+  --hair:oklch(0.95 0.020 200 / .12);
   --mono:'Space Mono',ui-monospace,monospace;
 }
 
 /* light mode — blackwork returns to dark ink on warm paper (like the real tattoo) */
 html[data-theme="light"]{
-  --bg:#e7e2d4;
-  --bg-2:#ded8c7;
-  --panel:#f1ede2;
-  --line:#16181c;        /* dark ink linework */
-  --line-2:#5a5f66;
-  --line-dim:#b9b3a2;     /* faint structure */
-  --ink:#23252a;         /* body text */
-  --ink-dim:#6a6e74;
-  --ink-faint:#9a9485;
-  --accent:#71499b;      /* signal shifts to deep violet on paper */
-  --accent-2:#b9a0d6;
-  --accent-glow:rgba(113,73,155,.30);
-  --hair:rgba(22,24,28,.10);
+  /* light = EDITORIAL — warm paper + claret ink (from fretboardcodex) */
+  --bg:oklch(0.972 0.006 85);
+  --bg-2:oklch(0.948 0.008 84);
+  --panel:oklch(0.99 0.004 85);
+  --line:oklch(0.23 0.012 60);         /* ink linework */
+  --line-2:oklch(0.53 0.010 62);       /* secondary linework */
+  --line-dim:oklch(0.80 0.010 76);     /* faint structure */
+  --ink:oklch(0.34 0.011 60);          /* body text */
+  --ink-dim:oklch(0.53 0.010 62);
+  --ink-faint:oklch(0.66 0.008 64);
+  --accent:oklch(0.505 0.15 32);       /* claret signal */
+  --accent-2:oklch(0.70 0.11 34);
+  --accent-glow:oklch(0.505 0.15 32 / .26);
+  --hair:oklch(0.23 0.012 60 / .08);
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
