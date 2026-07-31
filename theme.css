@@ -34,9 +34,9 @@ html[data-theme="light"]{
   --ink:oklch(0.34 0.011 60);          /* body text */
   --ink-dim:oklch(0.53 0.010 62);
   --ink-faint:oklch(0.66 0.008 64);
-  --accent:oklch(0.505 0.15 32);       /* claret signal */
-  --accent-2:oklch(0.70 0.11 34);
-  --accent-glow:oklch(0.505 0.15 32 / .26);
+  --accent:oklch(0.55 0.11 195);       /* cyan signal (matches dark), darkened for paper */
+  --accent-2:oklch(0.72 0.08 195);
+  --accent-glow:oklch(0.55 0.11 195 / .24);
   --hair:oklch(0.23 0.012 60 / .08);
 }
 
@@ -131,7 +131,7 @@ a{color:inherit}
   transition:color .18s,border-color .18s,background .18s;
 }
 .navbtn:hover,.navbtn[aria-expanded="true"]{color:var(--accent);border-color:var(--accent-2);background:rgba(95,179,196,.05)}
-html[data-theme="light"] .navbtn:hover,html[data-theme="light"] .navbtn[aria-expanded="true"]{background:rgba(113,73,155,.05)}
+html[data-theme="light"] .navbtn:hover,html[data-theme="light"] .navbtn[aria-expanded="true"]{background:color-mix(in srgb,var(--accent) 6%,transparent)}
 .navbtn .nb-n{color:var(--accent);font-size:10px;letter-spacing:.14em}
 .navbtn .nb-l{color:var(--line)}
 .navbtn .nb-chev{font-size:8px;color:var(--ink-faint);transition:transform .22s,color .22s}
@@ -162,7 +162,7 @@ html[data-theme="light"] .navmenu .navpop{box-shadow:0 22px 50px rgba(80,70,50,.
 }
 .navpop a:last-child{border-bottom:none}
 .navpop a:hover{color:var(--accent);padding-left:20px;background:rgba(95,179,196,.04)}
-html[data-theme="light"] .navpop a:hover{background:rgba(113,73,155,.04)}
+html[data-theme="light"] .navpop a:hover{background:color-mix(in srgb,var(--accent) 5%,transparent)}
 .navpop a .np-n{
   font-size:10px;letter-spacing:.12em;color:var(--ink-faint);
   width:34px;flex:0 0 auto;
@@ -171,7 +171,7 @@ html[data-theme="light"] .navpop a:hover{background:rgba(113,73,155,.04)}
 .navpop a .np-l{flex:1}
 .navpop a .np-a{font-size:10px;color:var(--ink-faint);letter-spacing:.06em}
 .navpop a.cur{color:var(--accent);background:rgba(95,179,196,.05)}
-html[data-theme="light"] .navpop a.cur{background:rgba(113,73,155,.05)}
+html[data-theme="light"] .navpop a.cur{background:color-mix(in srgb,var(--accent) 6%,transparent)}
 .navpop a.cur .np-n,.navpop a.cur .np-a{color:var(--accent)}
 .navpop a.cur:hover{padding-left:14px;cursor:default}
 
