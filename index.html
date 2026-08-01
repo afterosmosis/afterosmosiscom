@@ -94,6 +94,8 @@
   .term:hover .tring,.term:focus-visible .tring{opacity:1}
   .term.lit .tnode{fill:var(--accent)}
   .term:focus{outline:none}
+  .term .mring{transform-box:fill-box;transform-origin:center;animation:mpulse 2.6s ease-in-out infinite}
+  @keyframes mpulse{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.09);opacity:1}}
 
   /* links overlay */
   .linkmodal{display:none;position:fixed;inset:0;z-index:60;background:rgba(6,7,9,.86);
@@ -160,7 +162,7 @@
           <circle class="hot" cx="160" cy="116" r="46"/>
         </a>
         <a class="term lit" href="player.html" aria-label="music">
-          <circle class="mring tring" cx="640" cy="116" r="22" style="opacity:1"><animate attributeName="r" values="22;23.32;22" dur="2.6s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1" keyTimes="0;0.5;1"/><animate attributeName="opacity" values="0.55;1;0.55" dur="2.6s" repeatCount="indefinite" keyTimes="0;0.5;1"/></circle>
+          <circle class="mring tring" cx="640" cy="116" r="22" style="opacity:1"></circle>
           <circle class="tnode" cx="640" cy="116" r="14"/>
           <circle class="thole" cx="640" cy="116" r="5" style="fill:var(--bg)"/>
           <text class="tlabel" x="640" y="76" text-anchor="middle" font-family="var(--mono)">music</text>
@@ -252,8 +254,7 @@
   // ---- two quiet framing rings; the mechanisms carry the rest, with air between ----
   function ambiRing(parent,o){
     const c=E('circle',{cx:CX,cy:CY,r:o.r,fill:'none',stroke:o.stroke,'stroke-width':o.w,'stroke-dasharray':o.dash||'1 0'});
-    if(o.dur){const f=(o.dir<0?360:0)+' '+CX+' '+CY,t=(o.dir<0?0:360)+' '+CX+' '+CY;
-      c.appendChild(E('animateTransform',{attributeName:'transform',type:'rotate',from:f,to:t,dur:o.dur+'s',repeatCount:'indefinite'}));}
+    if(o.dur){c.style.transformBox='view-box';c.style.transformOrigin=CX+'px '+CY+'px';c.style.animation=(o.dir<0?'spin-rev ':'spin ')+o.dur+'s linear infinite';}
     parent.appendChild(c);
   }
   const ambi=E('g',{class:'ambi-stack'});root.appendChild(ambi);
@@ -270,8 +271,7 @@
     g.appendChild(E('circle',{class:'solder',cx:s[0].toFixed(2),cy:s[1].toFixed(2),r:4}));}
   // returns the rotating inner group; spoke + solder stay fixed on the outer group
   function section(key,extra){const g=group(key,extra);lead(g,key);const s=E('g',{});g.appendChild(s);return s;}
-  function rotate(s,dur,dir){const f=(dir<0?360:0)+' '+CX+' '+CY,t=(dir<0?0:360)+' '+CX+' '+CY;
-    s.appendChild(E('animateTransform',{attributeName:'transform',type:'rotate',from:f,to:t,dur:dur+'s',repeatCount:'indefinite'}));}
+  function rotate(s,dur,dir){s.style.transformBox='view-box';s.style.transformOrigin=CX+'px '+CY+'px';s.style.animation=(dir<0?'spin-rev ':'spin ')+dur+'s linear infinite';}
   function ringBase(s,r,w){s.appendChild(E('circle',{class:'base',cx:CX,cy:CY,r,fill:'none','stroke-width':w}));}
   // gear teeth around the whole rim
   function teethRing(s,r,teeth,h,wfrac,sw){const st=2*Math.PI/teeth;
