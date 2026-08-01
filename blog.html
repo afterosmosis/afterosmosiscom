@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="theme.css">
 <script src="theme.js"></script>
 <style>
+  html,body{background:var(--bg) !important}
   .page{position:relative;z-index:5;max-width:1080px;margin:0 auto;padding:96px 26px 0}
   .crumb{display:flex;align-items:center;gap:12px;margin-bottom:22px;font-size:12px;letter-spacing:.1em;color:var(--ink-dim);white-space:nowrap}
   .crumb .ring{width:20px;height:20px;flex:0 0 auto;animation:spin 40s linear infinite}
@@ -94,9 +95,13 @@
   </header>
 
   <main class="page" data-screen-label="blog">
+    <div class="crumb">
+      <svg class="ring" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6"><circle cx="12" cy="12" r="9" stroke-dasharray="20 6 10 5"/><circle cx="12" cy="12" r="3.5"/></svg>
+      <span>node 01 — <span class="t">blog</span></span><span class="blink"></span>
+    </div>
     <div class="layout">
       <section class="panel">
-        <div class="panel-bar"><span class="t"></span><span id="entryCount">— entries</span></div>
+        <div class="panel-bar"><span class="t">log</span><span id="entryCount">— entries</span></div>
         <div class="panel-bd">
           <div id="post"><div class="loading">retrieving transmission…</div></div>
         </div>

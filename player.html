@@ -140,7 +140,7 @@
     </div>
 
     <section class="panel">
-      <div class="panel-bar"><span class="t"></span><span id="libCount">03 albums</span></div>
+      <div class="panel-bar"><span class="t">library</span><span id="libCount">03 albums</span></div>
       <div class="panel-bd" style="padding:6px" id="albumList"></div>
     </section>
 
@@ -311,7 +311,7 @@ audio.addEventListener('playing',()=>setBtn('playing'));
 audio.addEventListener('pause',()=>{if(!audio.ended)setBtn('paused');});
 audio.addEventListener('ended',next);
 audio.addEventListener('error',()=>{const e=audio.error;const codes={1:'aborted',2:'network',3:'decode',4:'src not supported / 404'};showErr(audio.currentSrc||audio.src,codes[e&&e.code]||'unknown');});
-function showErr(src,why){const n=document.getElementById('npTrack');n.classList.add('err');n.textContent='⚠ cannot play — '+why;document.getElementById('npAlbum').textContent=src;console.error('[player]',why,src);np.classList.remove('playing');}
+function showErr(src,why){const n=document.getElementById('npTrack');n.classList.add('err');n.textContent='⚠ track not available yet';document.getElementById('npAlbum').textContent='this one hasn\u2019t been uploaded — try another';np.classList.remove('playing');np.classList.remove('loading');setBtn('paused');console.error('[player]',why,src);}
 function fmt(s){if(isNaN(s))return'0:00';return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');}
 
 document.getElementById('playBtn').addEventListener('click',togglePlay);
