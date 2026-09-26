@@ -532,3 +532,12 @@ h1,h2,h3 {
 .interior .album:not(.open) .tracks {
   display:none
 }
+
+/* Vector arrows avoid platform-dependent emoji presentation on iOS. */
+.link-arrow {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+  vertical-align: -0.125em;
+}
