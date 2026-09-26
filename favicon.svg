@@ -2,7 +2,8 @@
   <rect width="256" height="256" fill="#242626"/>
   <!-- A and O paths from the approved wordmark, spaced and weighted for small icons. -->
   <g transform="translate(27 78)" fill="none" stroke="#E3E1D9" stroke-width="14" stroke-linejoin="miter" stroke-miterlimit="2" stroke-linecap="square">
-    <path d="M0 100 46 0 92 100M17 64h58"/>
+    <path d="M0 100 46 0 92 100"/>
+    <path d="M20 64h52" stroke-linecap="butt"/>
     <path transform="translate(112)" d="M25 0h40c18 0 25 9 25 26v48c0 18-7 26-25 26H25C7 100 0 92 0 74V26C0 9 7 0 25 0Z"/>
   </g>
 </svg>
