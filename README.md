@@ -52,7 +52,7 @@ DNS remains managed in Cloudflare. Keep the existing DNS records and custom doma
 The desert redesign is plain HTML, CSS, and browser JavaScript. The review branch does not deploy; merging into `main` uses the existing GitHub Pages publication flow. Do not merge until the design is approved.
 
 - Uses the supplied desert landscape, optimized as a 174 KB JPEG, and the existing release artwork and audio files.
-- Reuses `brand-wordmark.png` verbatim. The supplied notes mention a vector wordmark, but no vector is present in the repository; replace this asset only when the approved vector is available.
+- Uses the supplied `images/ao-text-ivory.svg` wordmark in every page header and the home footer. `images/ao-text-charcoal.svg` is included for light backgrounds. Both SVGs are preserved verbatim.
 - Supporting text uses Avenir Next when installed, with Avenir / Segoe UI / sans-serif fallbacks. No font service or new font license is required.
 - Existing `player.html`, `blog.html`, `gear.html`, post hashes, and media URLs remain available. Release links select an album without starting playback.
 - Featured audio has native keyboard-accessible controls, `preload="none"`, and no autoplay.
