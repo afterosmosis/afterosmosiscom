@@ -130,19 +130,11 @@ h1,h2,h3 {
   padding:62px 5.5% 170px;
   min-height:550px
 }
-.hero-copy .eyebrow {
-  margin-bottom:24px
-}
 .hero h1 {
   font-size:clamp(56px,6.7vw,106px);
   font-weight:400;
   letter-spacing:-.045em;
   line-height:1.05
-}
-.hero-description {
-  margin-top:27px;
-  color:#d0d1cb;
-  font-size:17px
 }
 .hero-actions {
   display:flex;
@@ -449,10 +441,6 @@ h1,h2,h3 {
   }
   .hero h1 {
     font-size:62px
-  }
-  .hero-description {
-    max-width:245px;
-    font-size:15px
   }
   .hero-actions {
     gap:20px;
