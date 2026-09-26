@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="stylesheet" href="theme.css">
-<script src="theme.js"></script>
+
 <style>
   .page{position:relative;z-index:5;max-width:920px;margin:0 auto;padding:96px 26px 0}
   .crumb{display:flex;align-items:center;gap:12px;margin-bottom:22px;font-size:12px;letter-spacing:.1em;color:var(--ink-dim);white-space:nowrap}
@@ -111,33 +111,18 @@
   .toast.on{display:block;animation:siglin .4s ease}
   .toast .l{color:var(--ink-dim);font-size:9px;display:block;margin-bottom:5px}
 </style>
+<link rel="stylesheet" href="redesign.css">
 </head>
-<body>
+<body class="interior">
+<a class="skip-link" href="#main">Skip to content</a>
 <div class="wrap">
-  <header class="topbar">
-    <a class="brand" href="index.html">
-      <svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9" stroke-dasharray="22 7 12 5"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>
-      <img class="wordmark" src="brand-wordmark.png" alt="after osmosis">
-    </a>
-    <div class="navmenu">
-      <button class="navbtn" type="button" aria-label="navigate to node">
-        <span class="nb-n">n02</span><span class="nb-l">music</span><span class="nb-chev">▾</span>
-      </button>
-      <div class="navpop panel" role="menu">
-        <div class="pop-bar"><span class="t">:: nodes ::</span><span>[ esc ]</span></div>
-        <a href="index.html" role="menuitem"><span class="np-n">∴</span><span class="np-l">index</span><span class="np-a">sigil</span></a>
-        <a href="blog.html" role="menuitem"><span class="np-n">n01</span><span class="np-l">blog</span><span class="np-a">transmission</span></a>
-        <a href="player.html" class="cur" role="menuitem" aria-current="page"><span class="np-n">n02</span><span class="np-l">music</span><span class="np-a">▸ here</span></a>
-        <a href="gear.html" role="menuitem"><span class="np-n">n03</span><span class="np-l">gear</span><span class="np-a">rack</span></a>
-      </div>
-    </div>
-  </header>
+  <header class="site-header">
+  <a class="site-brand" href="index.html" aria-label="After Osmosis home"><img src="images/ao-text-ivory.svg" alt="After Osmosis" width="1400" height="190"></a>
+  <nav aria-label="Main navigation"><a href="index.html#music">Music</a><a href="index.html#studio">Studio</a><a href="index.html#about">About</a></nav>
+</header>
 
-  <main class="page" data-screen-label="music">
-    <div class="crumb">
-      <svg class="ring" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6"><circle cx="12" cy="12" r="9" stroke-dasharray="20 6 10 5"/><circle cx="12" cy="12" r="3.5"/></svg>
-      <span>node 02 — <span class="t">music</span></span><span class="blink"></span>
-    </div>
+  <main id="main" class="page" data-screen-label="music">
+    <div class="interior-heading"><p class="eyebrow">After Osmosis / Music</p><h1>The music</h1></div>
 
     <section class="panel">
       <div class="panel-bar"><span class="t">library</span><span id="libCount">03 albums</span></div>
@@ -165,7 +150,7 @@
           <button class="btn" id="prevBtn"><span class="ico">⏮</span><span class="lbl">prev</span></button>
           <button class="btn" id="nextBtn"><span class="lbl">next</span><span class="ico">⏭</span></button>
           <button class="btn" id="stopBtn"><span class="ico">■</span><span class="lbl">stop</span></button>
-          <div class="vol"><span>vol</span><input type="range" min="0" max="100" value="70" id="vol"><span id="volV">70</span></div>
+          <div class="vol"><span>vol</span><input type="range" min="0" max="100" value="70" id="vol" aria-label="Volume"><span id="volV">70</span></div>
         </div>
       </div>
     </section>
@@ -221,13 +206,13 @@ function mk(open){return '<svg class="mk" width="18" height="18" viewBox="0 0 18
 function render(){
   listEl.innerHTML='';
   albums.forEach((al,ai)=>{
-    const d=document.createElement('div');d.className='album'+(ai===0?' open':'');
-    d.innerHTML='<div class="album-hd">'+mk()+'<span class="album-ti">'+al.title+'</span><span class="album-ct">'+String(al.tracks.length).padStart(2,'0')+' trk</span></div>'+
-      '<div class="tracks">'+al.tracks.map((t,ti)=>'<div class="track" data-a="'+ai+'" data-t="'+ti+'"><span class="tn">'+String(ti+1).padStart(2,'0')+'</span><span class="track-name">'+t.name+'</span><span class="eq"><span></span><span></span><span></span><span></span></span></div>').join('')+'</div>';
+    const d=document.createElement('div');d.className='album'+(ai===0?' open':'');d.id='album-'+ai;
+    d.innerHTML='<button type="button" class="album-hd" aria-expanded="'+(ai===0)+'">'+mk()+'<span class="album-ti">'+al.title+'</span><span class="album-ct">'+String(al.tracks.length).padStart(2,'0')+' trk</span></button>'+
+      '<div class="tracks">'+al.tracks.map((t,ti)=>'<button type="button" class="track" data-a="'+ai+'" data-t="'+ti+'"><span class="tn">'+String(ti+1).padStart(2,'0')+'</span><span class="track-name">'+t.name+'</span><span class="eq"><span></span><span></span><span></span><span></span></span></button>').join('')+'</div>';
     d.querySelector('.album-hd').addEventListener('click',()=>{
       const wasOpen=d.classList.contains('open');
       document.querySelectorAll('.album').forEach(x=>x.classList.remove('open'));
-      if(!wasOpen)d.classList.add('open');
+      if(!wasOpen)d.classList.add('open');syncAlbums();
     });
     d.querySelectorAll('.track').forEach(tr=>tr.addEventListener('click',()=>play(+tr.dataset.a,+tr.dataset.t)));
     listEl.appendChild(d);
@@ -280,8 +265,11 @@ function play(ai,ti){
   buildWave((ai+1)*100+ti+1);
   // open the album & highlight
   document.querySelectorAll('.album').forEach((x,i)=>x.classList.toggle('open',i===ai));
-  document.querySelectorAll('.track').forEach(tr=>tr.classList.toggle('playing',+tr.dataset.a===ai&&+tr.dataset.t===ti));
+  document.querySelectorAll('.track').forEach(tr=>tr.classList.toggle('playing',+tr.dataset.a===ai&&+tr.dataset.t===ti));syncAlbums();
 }
+function syncAlbums(){document.querySelectorAll('.album').forEach(el=>el.querySelector('.album-hd').setAttribute('aria-expanded',String(el.classList.contains('open'))));}
+function selectRelease(){const match=location.hash.match(/^#album-([0-2])$/);if(!match)return;document.querySelectorAll('.album').forEach((el,i)=>el.classList.toggle('open',i===Number(match[1])));syncAlbums();}
+window.addEventListener('hashchange',selectRelease);
 function togglePlay(){if(!audio.src)return;if(audio.paused){tryPlay();}else{audio.pause();}}
 function stop(){playToken++;audio.pause();audio.currentTime=0;setBtn('paused');}
 function next(){if(curA===null)return;let a=curA,t=curT+1;if(t>=albums[a].tracks.length){a++;t=0;if(a>=albums.length)a=0;}play(a,t);}
@@ -323,7 +311,7 @@ vol.addEventListener('input',e=>{audio.volume=e.target.value/100;document.getEle
 audio.volume=.7;
 
 document.addEventListener('keydown',e=>{
-  if(document.getElementById('ee2').classList.contains('on'))return;
+  if(e.target.closest('button, input, a, textarea, select') || document.getElementById('ee2')?.classList.contains('on'))return;
   if(e.key===' '){e.preventDefault();togglePlay();}
   else if(e.key==='ArrowRight'&&!e.shiftKey){next();}
   else if(e.key==='ArrowLeft'){prev();}
@@ -347,6 +335,7 @@ document.addEventListener('keydown',e=>{
 })();
 
 render();
+selectRelease();
 </script>
 </body>
 </html>

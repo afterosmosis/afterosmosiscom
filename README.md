@@ -12,8 +12,10 @@ gear.html         current + archived rig
 player.html       music player
 posts/            one html fragment per post + index.json manifest
 images/           covers, gear photos
-theme.css         shared styles (light/dark)
-theme.js          theme toggle
+redesign.css      desert palette, responsive landing + interior styles
+home.js           featured audio error message
+theme.css         retained interior component styles
+theme.js          legacy theme toggle (not loaded by redesigned pages)
 eggs.js           small interactive bits
 image-slot.js     <image-slot> custom element used on gear.html
 ```
@@ -41,6 +43,20 @@ then open http://localhost:8000.
 
 - pages source: `main` branch, `/` (root).
 - `CNAME` pins the custom domain to `afterosmosis.com`.
-- `.nojekyll` disables jekyll so all files (including `_*`) are served as-is.
+- The redesign keeps the existing Pages configuration and has no build step or server runtime.
 
-dns: at the registrar, point an `A` record for the apex at github pages' ips (185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153) and a `CNAME` for `www` at `<your-username>.github.io`. enable "enforce https" once the cert provisions.
+DNS remains managed in Cloudflare. Keep the existing DNS records and custom domain configuration; no hosting migration is needed.
+
+## redesign review
+
+The desert redesign is plain HTML, CSS, and browser JavaScript. The review branch does not deploy; merging into `main` uses the existing GitHub Pages publication flow. Do not merge until the design is approved.
+
+- Uses the supplied desert landscape, optimized as a 174 KB JPEG, and the existing release artwork and audio files.
+- Uses the supplied `images/ao-text-ivory.svg` wordmark in every page header and the home footer. `images/ao-text-charcoal.svg` is included for light backgrounds. Both SVGs are preserved verbatim.
+- Supporting text uses Avenir Next when installed, with Avenir / Segoe UI / sans-serif fallbacks. No font service or new font license is required.
+- Existing `player.html`, `blog.html`, `gear.html`, post hashes, and media URLs remain available. Release links select an album without starting playback.
+- Featured audio has native keyboard-accessible controls, `preload="none"`, and no autoplay.
+
+### review locally
+
+Run the static server above, open the home page, and check desktop and narrow mobile widths. Follow all three release links; each should open the corresponding album without playing. Choose a track to test play/pause, next, previous, and volume. Check the journal and gear archive. All site assets and audio are local to the repository; outgoing social links keep their existing destinations.
