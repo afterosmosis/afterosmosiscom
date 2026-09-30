@@ -303,6 +303,7 @@ h1,h2,h3 {
   gap:10%
 }
 .about h2 {
+  font-size:clamp(28px,2.8vw,38px);
   line-height:1.18
 }
 .about div>p {
