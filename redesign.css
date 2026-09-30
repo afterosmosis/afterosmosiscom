@@ -105,6 +105,11 @@ h1,h2,h3 {
 .site-header nav a {
   padding:8px 0
 }
+.site-header nav a[aria-current="page"] {
+  text-decoration:underline;
+  text-decoration-thickness:1px;
+  text-underline-offset:6px
+}
 .hero {
   position:relative;
   isolation:isolate;
