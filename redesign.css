@@ -170,7 +170,7 @@ h1,h2,h3 {
   border-top:1px solid #7a817666;
   padding:28px 0 34px;
   display:grid;
-  grid-template-columns:1fr auto auto;
+  grid-template-columns:1fr auto;
   align-items:center;
   gap:35px
 }
