@@ -1,7 +1,7 @@
 /* Desert horizon: plain static CSS, shared by the landing and existing pages. */
 :root {
   color-scheme:dark;
-  --bg:#242626;
+  --bg:#202627;
   --bg-2:#292d2d;
   --panel:#292d2d;
   --line:#e3e1d9;
@@ -549,4 +549,22 @@ h1,h2,h3 {
   height: 1em;
   flex-shrink: 0;
   vertical-align: -0.125em;
+}
+
+/* Static signal accents echo the artwork without affecting reading or controls. */
+.hero-signal {
+  pointer-events:none;
+  clip-path:inset(17% 0 60% 0);
+  mask-image:linear-gradient(to bottom,transparent 17%,#000 17% 18%,transparent 18% 32%,#000 32% 33%,transparent 33%);
+  transform:translateX(7px);
+  opacity:.65;
+}
+.about-portrait img {
+  width:min(100%,300px);
+  height:auto;
+  margin-top:24px;
+}
+.about-portrait>.eyebrow { margin:0; font-size:11px }
+.home .about,.home .section-heading {
+  border-image:linear-gradient(to right,var(--hair) 0 18%,transparent 18% 19%,var(--hair) 19% 74%,transparent 74% 75%,var(--hair) 75%) 1;
 }
