@@ -559,12 +559,6 @@ h1,h2,h3 {
   transform:translateX(7px);
   opacity:.65;
 }
-.about-portrait img {
-  width:min(100%,300px);
-  height:auto;
-  margin-top:24px;
-}
-.about-portrait>.eyebrow { margin:0; font-size:11px }
 .home .about,.home .section-heading {
   border-image:linear-gradient(to right,var(--hair) 0 18%,transparent 18% 19%,var(--hair) 19% 74%,transparent 74% 75%,var(--hair) 75%) 1;
 }
