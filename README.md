@@ -52,7 +52,7 @@ DNS remains managed in Cloudflare. Keep the existing DNS records and custom doma
 The desert redesign is plain HTML, CSS, and browser JavaScript. The review branch does not deploy; merging into `main` uses the existing GitHub Pages publication flow. Do not merge until the design is approved.
 
 - Uses the supplied desert landscape, optimized as a 174 KB JPEG, and the existing release artwork and audio files.
-- Uses the supplied `images/ao-text-ivory.svg` wordmark in every page header and the home footer. `images/ao-text-charcoal.svg` is included for light backgrounds. Both SVGs are preserved verbatim.
+- Uses the supplied `images/ao-text-ivory.svg` wordmark in every page header and the home footer. `images/ao-text-charcoal.svg` is included for light backgrounds. Both SVGs match the supplied artwork except for one correction: the R's leg now starts inside the bowl stroke so its square end cap no longer pokes through the bowl (the charcoal variant also uses the palette charcoal `#202627`).
 - Supporting text uses Avenir Next when installed, with Avenir / Segoe UI / sans-serif fallbacks. No font service or new font license is required.
 - Existing `player.html`, `blog.html`, `gear.html`, post hashes, and media URLs remain available. Release links select an album without starting playback.
 - Featured audio has native keyboard-accessible controls, `preload="none"`, and no autoplay.
@@ -60,3 +60,8 @@ The desert redesign is plain HTML, CSS, and browser JavaScript. The review branc
 ### review locally
 
 Run the static server above, open the home page, and check desktop and narrow mobile widths. Follow all three release links; each should open the corresponding album without playing. Choose a track to test play/pause, next, previous, and volume. Check the journal and gear archive. All site assets and audio are local to the repository; outgoing social links keep their existing destinations.
+
+### brand v2 assets
+
+- `favicon.svg`, `favicon-16x16.png`, `favicon-32x32.png`, `favicon.ico`, `apple-touch-icon.png`: the glitch circle-and-triangle mark on a charcoal tile (raw white would disappear on light browser tabs). The SVG is traced from the supplied PSD. Bump the `?v=` query on the icon links when these change.
+- `images/og-share-card-1200x630.jpg`: link-preview image (Open Graph and Twitter/X large card). Keep text inside the central safe area when making a new one.
