@@ -113,16 +113,23 @@ h1,h2,h3 {
 .hero {
   position:relative;
   isolation:isolate;
-  background:#172024
+  overflow:hidden;
+  background:#202627 url(images/hero-poster.jpg) center / cover no-repeat
 }
-.hero-landscape {
+.hero-video {
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
   object-fit:cover;
-  object-position:65% center;
+  object-position:62% 50%;
+  pointer-events:none;
   z-index:-2
+}
+@media (prefers-reduced-motion:reduce) {
+  .hero-video {
+    display:none
+  }
 }
 .hero:after {
   content:'';
@@ -438,9 +445,6 @@ h1,h2,h3 {
     gap:30px;
     font-size:13px
   }
-  .hero-landscape {
-    object-position:68% center
-  }
   .hero-copy {
     padding:45px 6% 150px;
     min-height:0
@@ -551,14 +555,6 @@ h1,h2,h3 {
   vertical-align: -0.125em;
 }
 
-/* Static signal accents echo the artwork without affecting reading or controls. */
-.hero-signal {
-  pointer-events:none;
-  clip-path:inset(17% 0 60% 0);
-  mask-image:linear-gradient(to bottom,transparent 17%,#000 17% 18%,transparent 18% 32%,#000 32% 33%,transparent 33%);
-  transform:translateX(7px);
-  opacity:.65;
-}
 .home .about,.home .section-heading {
   border-image:linear-gradient(to right,var(--hair) 0 18%,transparent 18% 19%,var(--hair) 19% 74%,transparent 74% 75%,var(--hair) 75%) 1;
 }
