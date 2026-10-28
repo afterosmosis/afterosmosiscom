@@ -1,0 +1,4 @@
+
+# Audio masters live outside the repo; the site serves MP3 only.
+*.wav
+*.flac
