@@ -612,3 +612,24 @@ h1,h2,h3 {
     letter-spacing:.08em
   }
 }
+
+/* Home page: the hero lockup is the wordmark, so the header one is hidden visually (kept for screen readers as the home link). */
+.home .site-brand {
+  position:absolute;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+  clip-path:inset(50%);
+  white-space:nowrap
+}
+.home .site-header nav {
+  margin-left:auto
+}
+@media(max-width:640px) {
+  .home .site-header {
+    padding-bottom:0
+  }
+  .home .site-header nav {
+    margin-left:0
+  }
+}
